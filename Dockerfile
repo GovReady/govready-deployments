@@ -36,6 +36,9 @@ WORKDIR /opt
 RUN git clone https://github.com/GovReady/govready-q.git
 WORKDIR /opt/govready-q
 
+## # Copy utility scripts
+## COPY dockerfile_exec.sh first_run.sh .
+
 # Install Python requirements.
 RUN pip3 install --no-cache-dir -r requirements.txt
 
@@ -45,6 +48,9 @@ RUN pip3 install gevent==21.1.2
 # Fetch vendor resources.
 RUN ./fetch-vendor-resources.sh
 
+# Copy utility scripts
+COPY dockerfile_exec.sh first_run.sh .
+
 # This directory must be present for the AppSource created by our
 # first_run script. The directory only has something in it if
 # the container is launched with --mount.
@@ -52,4 +58,4 @@ RUN ./fetch-vendor-resources.sh
 RUN mkdir -p /mnt/q-files-host
  
 # Set the startup script.
-CMD [ "supervisord", "-c", "/etc/opt/supervisord.ini", "-n" ]
+CMD [ "bash", "dockerfile_exec.sh" ]
