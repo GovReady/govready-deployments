@@ -39,6 +39,9 @@ WORKDIR /opt/govready-q
 # Install Python requirements.
 RUN pip3 install --no-cache-dir -r requirements.txt
 
+# Upgrade gevent
+RUN pip3 install gevent==21.1.2
+
 # Fetch vendor resources.
 RUN ./fetch-vendor-resources.sh
 
@@ -49,4 +52,4 @@ RUN ./fetch-vendor-resources.sh
 RUN mkdir -p /mnt/q-files-host
  
 # Set the startup script.
-CMD [ "bash" ]
+CMD [ "supervisord", "-c", "/etc/opt/supervisord.ini", "-n" ]
