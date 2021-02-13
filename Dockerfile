@@ -48,8 +48,11 @@ RUN pip3 install gevent==21.1.2
 # Fetch vendor resources.
 RUN ./fetch-vendor-resources.sh
 
+# Copy config files
+COPY config/gunicorn.conf.py /etc/opt/gunicorn.conf.py
+
 # Copy utility scripts
-COPY dockerfile_exec.sh first_run.sh .
+COPY dockerfile_exec.py first_run.sh /usr/local/bin/
 
 # This directory must be present for the AppSource created by our
 # first_run script. The directory only has something in it if
@@ -58,4 +61,4 @@ COPY dockerfile_exec.sh first_run.sh .
 RUN mkdir -p /mnt/q-files-host
  
 # Set the startup script.
-CMD [ "bash", "dockerfile_exec.sh" ]
+ENTRYPOINT [ "dockerfile_exec.py" ]
