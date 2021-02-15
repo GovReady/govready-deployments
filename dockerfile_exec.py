@@ -88,7 +88,7 @@ In order to run in demonstration mode, GovReady-Q needs you to start the contain
 
 Use this command to start GovReady-Q in detached mode, with port forwarding enabled:
 
-  docker run --rm -p 8000:8000 grq-demo demo
+  docker run --rm -p 8000:8000 govready-demo demo
 
 Some startup messages will be printed, and then you'll be prompted to visit http://localhost:8000/ in your browser.
 
