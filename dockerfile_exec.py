@@ -20,11 +20,11 @@ def main():
     # check for demo argument
     if len(sys.argv)<2 or sys.argv[1] != "demo":
         # if no demo argument, print help and exit
-        print_help_1()
+        print(help_message_1())
         sys.exit(0)
     else:
-        # if demo argument, start server
-        print("This is GovReady-Q.", flush=True)
+        # if demo argument, start server; print welcome banner and version
+        print(help_message_0(), flush=True)
         with open('VERSION') as f:
             print(f.read(), flush=True)
 
@@ -65,12 +65,20 @@ def main():
 
 ################################################################
 #
-# print messages
+# help messages
 #
 ################################################################
 
-def print_help_1():
-    print ("""\
+def help_message_0():
+    return """\
+
+<<<<<<<<<<<<<<<< WELCOME TO GOVREADY >>>>>>>>>>>>>>>>
+
+This is GovReady-Q."""
+# end of help_message_0()
+
+def help_message_1():
+    return """\
 
 <<<<<<<<<<<<<<<< WELCOME TO GOVREADY >>>>>>>>>>>>>>>>
 
@@ -80,7 +88,7 @@ In order to run in demonstration mode, GovReady-Q needs you to start the contain
 
 Use this command to start GovReady-Q in detached mode, with port forwarding enabled:
 
-  docker run --rm -p 8000:8000 govready/govready-q demo
+  docker run --rm -p 8000:8000 grq-demo demo
 
 Some startup messages will be printed, and then you'll be prompted to visit http://localhost:8000/ in your browser.
 
@@ -91,8 +99,8 @@ https://github.com/GovReady/govready-docker
 For more information about GovReady and its products and services, visit:
 
 https://govready.com/
-""")
-# end of print_help_1()
+"""
+# end of help_message_1()
 
 ################################################################
 #
