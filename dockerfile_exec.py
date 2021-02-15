@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import re
+import requests
 import signal
 import subprocess
 from subprocess import DEVNULL, PIPE, STDOUT
@@ -42,19 +43,28 @@ def main():
         # create an initial administrative user and organization
         # non-interactively and write the administrator's initial
         # password to standard output.
-        print("setting up system and creating demo user...", flush = True)
+        print("setting up system and creating demo user...", flush=True)
         p = subprocess.run(['./manage.py', 'first_run', '--non-interactive'], capture_output=True)
-        print("... done setting up system and creating demo user.\n", flush = True)
+        print("... done setting up system and creating demo user.\n", flush=True)
 
         m = re.search('\n(Created administrator account.+)\n', p.stdout.decode('utf-8'))
         if m:
-            print(m.group(1) + "\n", flush = True)
+            print(m.group(1) + "\n", flush=True)
 
 
         # start the server
-        print("starting GovReady server...", flush = True)
+        print("starting GovReady server...", flush=True)
         p = subprocess.Popen(['gunicorn', '--config', '/etc/opt/gunicorn.conf.py', 'siteapp.wsgi'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        print("GovReady-Q is running.\nVisit http://localhost:8000/ with your browser.\nLog in with the administrator credentials above.\nHit control-C to exit.", flush=True)
+
+        # wait for server to come alive
+        while True:
+            p = subprocess.run(['curl', '-v', 'http://localhost:8000'], capture_output=True)
+            if p.returncode == 0:
+                break
+            time.sleep(1)
+
+        # let user know they're good to go
+        print(help_message_2(), flush=True)
 
         # sleep while GovReady runs
         while True:
@@ -101,6 +111,13 @@ For more information about GovReady and its products and services, visit:
 https://govready.com/
 """
 # end of help_message_1()
+
+def help_message_2():
+    return """\
+GovReady-Q is running.
+Visit http://localhost:8000/ with your browser.
+Log in with the administrator credentials above.
+Hit control-C to exit."""
 
 ################################################################
 #
