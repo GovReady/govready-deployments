@@ -16,7 +16,7 @@ cd govready-docker
 
 Remove old image (if any), and build a new one.
 
-Currently the Dockerfile retrieves GovReady's `main` branch.  Subsequent versions will pull a specific release tag instead of `main`.
+Currently the Dockerfile retrieves GovReady's `main` (e.g., `master`) branch.  Subsequent versions will pull a specific release tag instead of `main`.
 
 ```shell
 docker rmi govready-demo ; docker build --tag govready-demo .
