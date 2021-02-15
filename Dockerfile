@@ -28,22 +28,15 @@ RUN apt-get -y install \
   python3 python3-pip \
   python3-yaml \
   graphviz pandoc \
-  gunicorn \
-  supervisor
+  gunicorn
 
 # Install GovReady application.
 WORKDIR /opt
 RUN git clone https://github.com/GovReady/govready-q.git
 WORKDIR /opt/govready-q
 
-## # Copy utility scripts
-## COPY dockerfile_exec.sh first_run.sh .
-
 # Install Python requirements.
 RUN pip3 install --no-cache-dir -r requirements.txt
-
-# Upgrade gevent
-RUN pip3 install gevent==21.1.2
 
 # Fetch vendor resources.
 RUN ./fetch-vendor-resources.sh
