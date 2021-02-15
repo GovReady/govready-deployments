@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import re
+import requests
 import signal
 import subprocess
 from subprocess import DEVNULL, PIPE, STDOUT
@@ -17,9 +18,25 @@ def main():
     # Gracefully exit on control-C
     signal.signal(signal.SIGINT, lambda signal_number, current_stack_frame: sys.exit(0))
 
+    # set up args dict
+    args = {}
+
+    # check for verbose argument
+    args['verbose'] = False
+    if "-v" in sys.argv:
+        args['verbose'] = True
+    if "--verbose" in sys.argv:
+        args['verbose'] = True
+    if "verbose" in sys.argv:
+        args['verbose'] = True
+
     # check for demo argument
-    if len(sys.argv)<2 or sys.argv[1] != "demo":
-        # if no demo argument, print help and exit
+    args['demo'] = False
+    if "demo" in sys.argv:
+        args['demo'] = True
+
+    # if no demo argument, print help and exit
+    if not args['demo']:
         print(help_message_1())
         sys.exit(0)
     else:
@@ -42,19 +59,30 @@ def main():
         # create an initial administrative user and organization
         # non-interactively and write the administrator's initial
         # password to standard output.
-        print("setting up system and creating demo user...", flush = True)
+        print("setting up system and creating demo user...", flush=True)
         p = subprocess.run(['./manage.py', 'first_run', '--non-interactive'], capture_output=True)
-        print("... done setting up system and creating demo user.\n", flush = True)
+        print("... done setting up system and creating demo user.\n", flush=True)
 
         m = re.search('\n(Created administrator account.+)\n', p.stdout.decode('utf-8'))
         if m:
-            print(m.group(1) + "\n", flush = True)
+            print(m.group(1) + "\n", flush=True)
 
 
         # start the server
-        print("starting GovReady server...", flush = True)
+        print("starting GovReady server...", flush=True)
         p = subprocess.Popen(['gunicorn', '--config', '/etc/opt/gunicorn.conf.py', 'siteapp.wsgi'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        print("GovReady-Q is running.\nVisit http://localhost:8000/ with your browser.\nLog in with the administrator credentials above.\nHit control-C to exit.", flush=True)
+
+        # wait for server to come alive
+        while True:
+            p = subprocess.run(['curl', 'http://localhost:8000'], capture_output=True)
+            if p.returncode == 0:
+                break
+            if args['verbose']:
+                print("check for server with curl return code = {}".format(p.returncode), flush=True)
+            time.sleep(1)
+
+        # let user know they're good to go
+        print(help_message_2(), flush=True)
 
         # sleep while GovReady runs
         while True:
@@ -101,6 +129,13 @@ For more information about GovReady and its products and services, visit:
 https://govready.com/
 """
 # end of help_message_1()
+
+def help_message_2():
+    return """\
+GovReady-Q is running.
+Visit http://localhost:8000/ with your browser.
+Log in with the administrator credentials above.
+Hit control-C to exit."""
 
 ################################################################
 #
