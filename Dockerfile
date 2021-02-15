@@ -1,5 +1,5 @@
-# Ubuntu 20.04 focal-20201106
-FROM ubuntu:focal-20201106
+# Ubuntu 20.04 focal-20210119
+FROM ubuntu:focal-20210119
 
 # Expose the port that `manage.py runserver` uses by default.
 EXPOSE 8000
@@ -37,6 +37,9 @@ WORKDIR /opt/govready-q
 
 # Install Python requirements.
 RUN pip3 install --no-cache-dir -r requirements.txt
+
+# Upgrade gevent (regularly check if this is still necessary)
+RUN pip3 install gevent==21.1.2
 
 # Fetch vendor resources.
 RUN ./fetch-vendor-resources.sh
