@@ -30,13 +30,21 @@ def main():
     if "verbose" in sys.argv:
         args['verbose'] = True
 
+    # check for help argument
+    args['help'] = False
+    if "help" in sys.argv:
+        args['help'] = True
+
     # check for demo argument
     args['demo'] = False
     if "demo" in sys.argv:
         args['demo'] = True
 
-    # if no demo argument, print help and exit
-    if not args['demo']:
+    # act on help or NOT demo arguments, or start demo
+    if args['help']:
+        print(help_message_3())
+        sys.exit(0)
+    elif not args['demo']:
         print(help_message_1())
         sys.exit(0)
     else:
@@ -97,6 +105,8 @@ def main():
 #
 ################################################################
 
+### Help Message 0 ###
+
 def help_message_0():
     return """\
 
@@ -104,6 +114,8 @@ def help_message_0():
 
 This is GovReady-Q."""
 # end of help_message_0()
+
+### Help Message 1 ###
 
 def help_message_1():
     return """\
@@ -130,12 +142,77 @@ https://govready.com/
 """
 # end of help_message_1()
 
+### Help Message 2 ###
+
 def help_message_2():
     return """\
 GovReady-Q is running.
 Visit http://localhost:8000/ with your browser.
 Log in with the administrator credentials above.
 Hit control-C to exit."""
+
+### Help Message 3 ###
+
+def help_message_3():
+    return """\
+
+# WELCOME TO GOVREADY
+
+## Print this help message
+
+```
+    docker run --rm govready-demo help
+```
+
+## Create Documentation Files
+
+*not yet implemented*
+```
+    docker run --rm -v `pwd`:/docs govready-demo help docs
+```
+
+## Create Helper Scripts
+
+*not yet implemented*
+```
+    docker run --rm -v `pwd`:/docs govready-demo help helpers
+```
+
+## Run Commands
+
+### Print basic help
+
+```
+    docker run govready-demo
+```
+
+### Run demo, with port forwarding, but without persistence
+
+```
+    docker run --rm -p 8000:8000 govready-demo demo
+```
+
+### Run demo, with port forwarding, with volume mounts for persistence (UNIX-style `pwd`)
+```
+    docker run --rm -p8000:8000 \\
+    -v `pwd`/log:/var/log \\
+    -v `pwd`/config:/etc/opt \\
+    -v `pwd`/local:/opt/govready-q/local \\
+    govready-demo demo
+```
+
+## Build Commands
+
+### Remove and rebuild image
+
+    docker rmi govready-demo ; docker build --tag govready-demo .
+
+### Alternate build for debugging
+
+    docker build --tag govready-demo --progress plain --no-cache .
+
+"""
+# end of help_message_3()
 
 ################################################################
 #
