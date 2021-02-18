@@ -10,6 +10,18 @@ import time
 
 ################################################################
 #
+# helpers
+#
+################################################################
+
+def run_optionally_verbose(args, verbose_flag):
+    p = subprocess.run(args, capture_output=True)
+    if verbose_flag:
+        print("COMMAND:{}\nSTDOUT:\n{}\nSTDERR:\n{}".format(p.args, p.stdout.decode('utf-8'), p.stderr.decode('utf-8')))
+    return p
+
+################################################################
+#
 # main()
 #
 ################################################################
@@ -52,41 +64,55 @@ def main():
         print(help_message_0(), flush=True)
         with open('VERSION') as f:
             print(f.read(), flush=True)
+        if args['verbose']:
+            p = run_optionally_verbose(['git', 'rev-parse', 'HEAD'], False)
+            print("govready-q commit hash = " + p.stdout.decode('utf-8'), flush=True)
 
         # run checks
         print("running some checks...", flush=True)
-        subprocess.run(['./manage.py', 'check', '--deploy'], capture_output=True)
+        run_optionally_verbose(['./manage.py', 'check', '--deploy'], args['verbose'])
         print("... done running some checks.\n", flush=True)
 
         # initialize the database
         print("initializing database...", flush=True)
-        subprocess.run(['./manage.py', 'migrate'], capture_output=True)
-        subprocess.run(['./manage.py', 'load_modules'], capture_output=True)
+        run_optionally_verbose(['./manage.py', 'migrate'], args['verbose'])
+        run_optionally_verbose(['./manage.py', 'load_modules'], args['verbose'])
         print("... done initializing database.\n", flush=True)
 
         # create an initial administrative user and organization
         # non-interactively and write the administrator's initial
         # password to standard output.
         print("setting up system and creating demo user...", flush=True)
-        p = subprocess.run(['./manage.py', 'first_run', '--non-interactive'], capture_output=True)
+        p = run_optionally_verbose(['./manage.py', 'first_run', '--non-interactive'], args['verbose'])
         print("... done setting up system and creating demo user.\n", flush=True)
 
         m = re.search('\n(Created administrator account.+)\n', p.stdout.decode('utf-8'))
         if m:
             print(m.group(1) + "\n", flush=True)
 
-
         # start the server
         print("starting GovReady server...", flush=True)
         p = subprocess.Popen(['gunicorn', '--config', '/etc/opt/gunicorn.conf.py', 'siteapp.wsgi'], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        if args['verbose']:
+            print("Running gunicorn, check logs for output.")
+        # "extra-verbose" is not currently implemented, but this code might useful some day
+        # note that any timeout here delays the next section, "wait for server to come alive"
+        if 'extra-verbose' in args:
+            try:
+                outs, errs = p.communicate(timeout=5)
+            except subprocess.TimeoutExpired:
+                outs, errs = None, None
+            print("COMMAND:{}\nSTDOUT (first 5 seconds):\n{}\nSTDERR (first 5 seconds):\n{}\n".format(p.args, outs, errs))
 
         # wait for server to come alive
         while True:
             p = subprocess.run(['curl', 'http://localhost:8000'], capture_output=True)
             if p.returncode == 0:
+                if args['verbose']:
+                    print("Got curl return code = 0", flush=True)
                 break
             if args['verbose']:
-                print("check for server with curl return code = {}".format(p.returncode), flush=True)
+                print("Checking for server - curl return code = {}, continuing to poll...".format(p.returncode), flush=True)
             time.sleep(1)
 
         # let user know they're good to go
