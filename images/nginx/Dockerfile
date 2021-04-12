@@ -10,8 +10,9 @@ RUN \
 ARG NGINX_CERT
 ARG NGINX_KEY
 
-COPY *${NGINX_CERT} /etc/pki/tls/certs/cert.pem
-COPY *${NGINX_KEY} /etc/pki/tls/private/key.pem
+# todo - fix; ec2 had error (could have been old docker version??
+#COPY *${NGINX_CERT} /etc/pki/tls/certs/cert.pem
+#COPY *${NGINX_KEY} /etc/pki/tls/private/key.pem
 
 RUN if [ "$NGINX_CERT" = "" ]; then \
     apk add --no-cache --update openssl \

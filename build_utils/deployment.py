@@ -24,7 +24,7 @@ class Helper:
             normalized_dict[key] = value
         env.update(normalized_dict)
         output = []
-        Prompt.notice(f"Executing command: [{cmd}]")
+        Prompt.notice(f"Executing command: {Colors.WARNING}{cmd}")
         with subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,  # stderr=subprocess.STDOUT,
                               bufsize=0, env=env) as proc:
             for line in proc.stdout:
@@ -77,7 +77,7 @@ class Deployment(Helper, ABC):
             elif (item['key'] not in self.config and not item['required']) or (
                     not self.config.get(item['key']) and not item['required']):
                 self.config[item['key']] = os.environ.get(item['key'])
-                warning = f"Config missing optional field: [{item['key']}] - {Colors.WARNING}{item['description']}"
+                warning = f"Config missing optional field: {item['key']} - {Colors.WARNING}{item['description']}"
                 if item.get('default-message'):
                     warning += f" - {Colors.CYAN}{item['default-message']}"
                 Prompt.notice(warning)

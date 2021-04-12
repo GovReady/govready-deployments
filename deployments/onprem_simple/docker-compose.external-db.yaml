@@ -5,6 +5,9 @@ networks:
 
 services:
   govready-q:
+    dns:
+      - 8.8.8.8
+      - 4.4.4.4
     container_name: govready_q
     build:
       context: ../../images/govready-q
@@ -25,7 +28,7 @@ services:
     ports:
       - "8000:8000"
     healthcheck:
-      test: curl --fail -s http://localhost:8000/ || exit 1
+      test: curl --fail -s http://${HOST}:8000 || exit 1
       interval: 10s
       timeout: 5s
       retries: 15

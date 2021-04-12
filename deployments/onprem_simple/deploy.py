@@ -9,7 +9,7 @@ class OnPremiseSimpleDeployment(Deployment):
         pass
 
     def on_sig_kill(self):
-        self.execute(cmd="docker-compose down --remove-orphans", env_dict={})
+        self.execute(cmd="docker-compose down --remove-orphans  --rmi all", env_dict={})
 
     def run(self):
         self.set_default('GIT_URL', "https://github.com/GovReady/govready-q.git")
@@ -22,13 +22,14 @@ class OnPremiseSimpleDeployment(Deployment):
         self.set_default('MOUNT_FOLDER', os.path.abspath("../../volumes"))
         self.set_default('HTTPS', "true")
         self.set_default('DEBUG', "false")
+        self.set_default('HOST', self.config['ADDRESS'].split(':')[0])
         using_internal_db = self.set_default('DATABASE_CONNECTION_STRING',
                                              "postgres://postgres:PASSWORD@postgres:5432/govready_q")
         docker_compose_file = "docker-compose.yaml"
         if not using_internal_db:
             docker_compose_file = 'docker-compose.external-db.yaml'
 
-        self.execute(cmd=f"docker-compose -f {docker_compose_file} down --remove-orphans", env_dict=self.config)
+        self.execute(cmd=f"docker-compose -f {docker_compose_file} down --remove-orphans  --rmi all", env_dict=self.config)
         self.execute(cmd=f"docker-compose -f {docker_compose_file} build", env_dict=self.config)
         self.execute(cmd=f"docker-compose -f {docker_compose_file} up -d", env_dict=self.config)
 
