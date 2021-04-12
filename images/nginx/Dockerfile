@@ -11,8 +11,9 @@ ARG NGINX_CERT
 ARG NGINX_KEY
 
 # todo - fix; ec2 had error (could have been old docker version??
-#COPY *${NGINX_CERT} /etc/pki/tls/certs/cert.pem
-#COPY *${NGINX_KEY} /etc/pki/tls/private/key.pem
+COPY *${NGINX_CERT} /etc/pki/tls/certs/
+COPY *${NGINX_KEY} /etc/pki/tls/private/
+
 
 RUN if [ "$NGINX_CERT" = "" ]; then \
     apk add --no-cache --update openssl \
@@ -24,5 +25,7 @@ RUN if [ "$NGINX_CERT" = "" ]; then \
     -out /etc/pki/tls/certs/cert.pem \
     -keyout /etc/pki/tls/private/key.pem \
     -subj "/C=US/ST=State/L=Locality/O=Organization/OU=Organizational Unit/CN=$HOST"; \
+  else \
+    cp /etc/pki/tls/certs/$NGINX_CERT /etc/pki/tls/certs/cert.pem \
+    && cp /etc/pki/tls/private/$NGINX_KEY /etc/pki/tls/private/key.pem; \
   fi
-
