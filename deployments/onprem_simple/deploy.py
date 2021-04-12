@@ -5,8 +5,11 @@ from build_utils.deployment import Deployment
 
 class OnPremiseSimpleDeployment(Deployment):
 
+    def on_fail(self):
+        self.execute(cmd=f"docker-compose logs", env_dict=self.config)
+
     def on_complete(self):
-        pass
+        self.execute(cmd=f"docker-compose logs", env_dict=self.config)
 
     def on_sig_kill(self):
         self.execute(cmd="docker-compose down --remove-orphans  --rmi all", env_dict={})
@@ -22,7 +25,7 @@ class OnPremiseSimpleDeployment(Deployment):
         self.set_default('MOUNT_FOLDER', os.path.abspath("../../volumes"))
         self.set_default('HTTPS', "true")
         self.set_default('DEBUG', "false")
-        self.set_default('HOST', self.config['ADDRESS'].split(':')[0])
+        self.set_default('HEALTH_CHECK_GOVREADY_Q', f"http://{self.config['ADDRESS'].split(':')[0]}:8000")
         using_internal_db = self.set_default('DATABASE_CONNECTION_STRING',
                                              "postgres://postgres:PASSWORD@postgres:5432/govready_q")
         docker_compose_file = "docker-compose.yaml"
@@ -32,4 +35,3 @@ class OnPremiseSimpleDeployment(Deployment):
         self.execute(cmd=f"docker-compose -f {docker_compose_file} down --remove-orphans  --rmi all", env_dict=self.config)
         self.execute(cmd=f"docker-compose -f {docker_compose_file} build", env_dict=self.config)
         self.execute(cmd=f"docker-compose -f {docker_compose_file} up -d", env_dict=self.config)
-

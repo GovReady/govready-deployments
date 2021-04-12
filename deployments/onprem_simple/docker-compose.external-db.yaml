@@ -5,9 +5,6 @@ networks:
 
 services:
   govready-q:
-    dns:
-      - 8.8.8.8
-      - 4.4.4.4
     container_name: govready_q
     build:
       context: ../../images/govready-q
@@ -23,13 +20,13 @@ services:
       - SECRET_KEY=${SECRET_KEY-}
       - DEBUG=${DEBUG-}
       - ADMINS=${ADMINS}
-      - HOST=${HOST}
+      - HEALTH_CHECK_GOVREADY_Q=${HEALTH_CHECK_GOVREADY_Q}
     volumes:
       - ${MOUNT_FOLDER}/govready-q:/var/log
     ports:
       - "8000:8000"
     healthcheck:
-      test: curl --fail -s http://$${HOST}:8000 || exit 1
+      test: curl --fail -s $$HEALTH_CHECK_GOVREADY_Q || exit 1
       interval: 10s
       timeout: 5s
       retries: 15

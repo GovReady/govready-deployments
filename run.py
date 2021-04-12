@@ -30,8 +30,8 @@ def run(options):
         deployment.validate()
         os.chdir(f"deployments/{options['type']}")
         deployment.run()
-        Prompt.success(f"Deployment complete - using the [{options['type']}] method")
         deployment.on_complete()
+        Prompt.success(f"Deployment complete - using the [{options['type']}] method")
     else:
         deployment_classes = UnDeploy.__subclasses__()
         if not deployment_classes:
@@ -39,8 +39,8 @@ def run(options):
         remove_deployment = deployment_classes[0](options)
         os.chdir(f"deployments/{options['type']}")
         remove_deployment.run()
-        Prompt.success(f"Deployment removed - using the [{options['type']}] method")
         remove_deployment.on_complete()
+        Prompt.success(f"Deployment removed - using the [{options['type']}] method")
 
 
 if __name__ == '__main__':

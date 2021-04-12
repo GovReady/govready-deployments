@@ -13,7 +13,7 @@ class Helper:
         signal.signal(signal.SIGINT, self.signal_handler)
         self.kill_captured = False
 
-    def execute(self, cmd, env_dict, display_stdout=True):
+    def execute(self, cmd, env_dict, display_stdout=True, on_error_fn=None):
         env = os.environ.copy()
         normalized_dict = {}
         for key, value in env_dict.items():
@@ -33,6 +33,8 @@ class Helper:
                 if display_stdout:
                     print(formatted)
         if proc.returncode != 0:
+            if on_error_fn:
+                on_error_fn()
             Prompt.error(f"[{cmd}] Failed [code:{proc.returncode}]- {proc.stderr}", close=True)
         return output
 
@@ -47,6 +49,9 @@ class Helper:
         raise NotImplementedError()
 
     def on_complete(self):
+        raise NotImplementedError()
+
+    def on_fail(self):
         raise NotImplementedError()
 
 
@@ -65,6 +70,9 @@ class Deployment(Helper, ABC):
             self.config[variable] = default
             return True
         return False
+
+    def execute(self, cmd, env_dict, display_stdout=True, on_error_fn=None):
+        return super().execute(cmd, env_dict, display_stdout, on_error_fn=self.on_fail)
 
     def validate(self):
         with open(self.options['config'], 'r') as f:
@@ -97,3 +105,6 @@ class UnDeploy(Helper, ABC):
 
     def run(self):
         raise NotImplementedError()
+
+    def execute(self, cmd, env_dict, display_stdout=True, on_error_fn=None):
+        return super().execute(cmd, env_dict, display_stdout, on_error_fn=self.on_fail)
