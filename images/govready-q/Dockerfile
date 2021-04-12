@@ -32,7 +32,11 @@ RUN apt-get -y install \
 
 # Install GovReady application.
 WORKDIR /opt
-RUN git clone https://github.com/GovReady/govready-q.git
+
+ARG VERSION
+ARG GIT_URL
+RUN git clone --depth 1 --branch ${VERSION} ${GIT_URL}
+
 WORKDIR /opt/govready-q
 
 # Install Python requirements.
@@ -48,7 +52,7 @@ RUN ./fetch-vendor-resources.sh
 COPY config/gunicorn.conf.py /etc/opt/gunicorn.conf.py
 
 # Copy utility scripts
-COPY dockerfile_exec.py first_run.sh /usr/local/bin/
+COPY dockerfile_exec.py first_run.sh docker_exec_prod.sh docker_exec_prod_email_notifications.sh /usr/local/bin/
 
 # This directory must be present for the AppSource created by our
 # first_run script. The directory only has something in it if
@@ -57,4 +61,4 @@ COPY dockerfile_exec.py first_run.sh /usr/local/bin/
 RUN mkdir -p /mnt/q-files-host
  
 # Set the startup script.
-ENTRYPOINT [ "dockerfile_exec.py" ]
+CMD [ "dockerfile_exec.py" ]

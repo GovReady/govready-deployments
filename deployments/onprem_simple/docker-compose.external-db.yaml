@@ -1,0 +1,76 @@
+version: '3'
+networks:
+  q_network:
+    driver: bridge
+
+services:
+  govready-q:
+    container_name: govready_q
+    build:
+      context: ../../images/govready-q
+      dockerfile: Dockerfile
+      args:
+        - VERSION=${VERSION}
+        - GIT_URL=${GIT_URL}
+    command: /bin/bash -c docker_exec_prod.sh
+    environment:
+      - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING-}
+      - ADDRESS=${ADDRESS-}
+      - HTTPS=${HTTPS-}
+      - SECRET_KEY=${SECRET_KEY-}
+      - DEBUG=${DEBUG-}
+      - ADMINS=${ADMINS}
+    volumes:
+      - ${MOUNT_FOLDER}/govready-q:/var/log
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: curl --fail -s http://localhost:8000/ || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 15
+    networks:
+      - q_network
+
+  govready-q-email-notifications:
+    container_name: govready_q_email_notifications
+    build:
+      context: ../../images/govready-q
+      dockerfile: Dockerfile
+      args:
+        - VERSION=${VERSION}
+        - GIT_URL=${GIT_URL}
+    command: /bin/bash -c docker_exec_prod_email_notifications.sh
+    environment:
+      - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING-}
+      - ADDRESS=${ADDRESS-}
+      - HTTPS=${HTTPS-}
+      - SECRET_KEY=${SECRET_KEY-}
+      - DEBUG=${DEBUG-}
+    volumes:
+      - ${MOUNT_FOLDER}/govready-q-email-notifications:/var/log
+    depends_on:
+      govready-q:
+        condition: service_healthy
+    networks:
+      - q_network
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ../../images/nginx
+      args:
+        - HOST=${GOVREADY_Q_HOST-test.example.com}
+        - NGINX_CERT=${NGINX_CERT}
+        - NGINX_KEY=${NGINX_KEY}
+    ports:
+      - "80:80"
+      - "${GOVREADY_Q_PORT-443}:443"
+    depends_on:
+      govready-q:
+        condition: service_healthy
+    networks:
+      - q_network
+
+volumes:
+   pg-data:
