@@ -53,6 +53,7 @@ COPY config/gunicorn.conf.py /etc/opt/gunicorn.conf.py
 
 # Copy utility scripts
 COPY dockerfile_exec.py first_run.sh docker_exec_prod.sh docker_exec_prod_email_notifications.sh /usr/local/bin/
+RUN chmod +x docker_exec*.sh
 
 # This directory must be present for the AppSource created by our
 # first_run script. The directory only has something in it if
