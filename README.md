@@ -17,6 +17,11 @@ Deployments are python modules that reside in `deployments`.  Each deployment mo
 - `config-validator.json` - JSON config that validates the user provided config.  
 
 ## Run
+#### Init
+This will generate a skeleton JSON configuration file for the deployment you choose to use.  It will output `deployment.json` to be used for specified deployment.
+
+Example: `python run.py init`
+
 #### Deploy
 The config JSON file will be validated against a deployments `deployments/<deployment_type>/config-validator.json`.  Make sure the provided configuration file has all the required keys and optional keys if you want to override the defaults.
 

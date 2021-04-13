@@ -51,24 +51,26 @@ class Helper:
         for tmp_build in docker_tmp_build_files:
             for key in tmp_build['keys']:
                 file_path = self.config[key]
-                if not os.path.exists(file_path):
-                    Prompt.error(f"{os.path.abspath(file_path)} does not exist.", close=True)
-                dest = os.path.join(self.config['ROOT_DIR'], 'images',
-                                    tmp_build['image'], os.path.basename(file_path))
-                copyfile(file_path, dest)
-                self.config[f"BUILD_FILE_{key}"] = os.path.basename(dest)
-                Prompt.notice(f"Copied build file for image: {tmp_build['image']} - {dest}")
+                if file_path:
+                    if not os.path.exists(file_path):
+                        Prompt.error(f"{os.path.abspath(file_path)} does not exist.", close=True)
+                    dest = os.path.join(self.config['ROOT_DIR'], 'images',
+                                        tmp_build['image'], os.path.basename(file_path))
+                    copyfile(file_path, dest)
+                    self.config[f"BUILD_FILE_{key}"] = os.path.basename(dest)
+                    Prompt.notice(f"Copied build file for image: {tmp_build['image']} - {dest}")
 
     def docker_build_tmp_files_cleanup(self, docker_tmp_build_files):
         for tmp_build in docker_tmp_build_files:
             for key in tmp_build['keys']:
                 file_path = self.config[key]
-                if not os.path.exists(file_path):
-                    Prompt.error(f"{os.path.abspath(file_path)} does not exist.", close=True)
-                dest = os.path.join(self.config['ROOT_DIR'], 'images',
-                                    tmp_build['image'], os.path.basename(file_path))
-                os.remove(dest)
-                Prompt.notice(f"Removed build file for image: {tmp_build['image']} - {dest}")
+                if file_path:
+                    if not os.path.exists(file_path):
+                        Prompt.error(f"{os.path.abspath(file_path)} does not exist.", close=True)
+                    dest = os.path.join(self.config['ROOT_DIR'], 'images',
+                                        tmp_build['image'], os.path.basename(file_path))
+                    os.remove(dest)
+                    Prompt.notice(f"Removed build file for image: {tmp_build['image']} - {dest}")
 
     def on_sig_kill(self):
         raise NotImplementedError()
@@ -108,7 +110,8 @@ class Deployment(Helper, ABC):
         self.config['ROOT_DIR'] = os.getcwd()
         missing = []
         for item in self.validation_config:
-            if item['key'] not in self.config and item['required']:
+            if (item['key'] not in self.config and item['required']) or \
+                    (not self.config.get(item['key']) and item['required']):
                 missing.append(item)
             elif (item['key'] not in self.config and not item['required']) or (
                     not self.config.get(item['key']) and not item['required']):
@@ -118,7 +121,7 @@ class Deployment(Helper, ABC):
                     warning += f" - {Colors.CYAN}{item['default-message']}"
                 Prompt.notice(warning)
         if missing:
-            missing_formatted = [f"{x['key']}: {x['description']}]" for x in missing]
+            missing_formatted = [f"{x['key']}: {x['description']}" for x in missing]
             Prompt.error(f"The following keys are missing from your config file: {missing_formatted}", close=True)
 
     def run(self):
@@ -134,5 +137,5 @@ class UnDeploy(Helper, ABC):
     def run(self):
         raise NotImplementedError()
 
-    def execute(self, cmd, env_dict, display_stdout=True, on_error_fn=None):
-        return super().execute(cmd, env_dict, display_stdout, on_error_fn=self.on_fail)
+    def execute(self, cmd, env_dict=None, display_stdout=True, on_error_fn=None, show_env=False):
+        return super().execute(cmd, env_dict, display_stdout, on_error_fn=self.on_fail, show_env=show_env)

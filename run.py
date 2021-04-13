@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import importlib
 from build_utils.deployment import Deployment, UnDeploy
@@ -13,6 +14,17 @@ def get_deployment_type(deployment_type_list):
 
 def run(options):
     path = f"deployments.{options['type']}.{options['action']}"
+
+    if options['action'] == 'init':
+        validator_config = os.path.join(f"{os.path.sep}".join(path.split('.')[:-1]), 'config-validator.json')
+        skeleton = {}
+        with open(validator_config, 'r') as f:
+            for row in json.load(f):
+                skeleton[row['key']] = ""
+        with open("deployment.json", 'w') as f:
+            json.dump(skeleton, f, indent=4, sort_keys=True)
+        return
+
     importlib.import_module(path)
     Prompt.warning(f"Attempting to [{options['action']}] using the [{options['type']}] method")
     if options['action'] == 'deploy':
@@ -45,13 +57,13 @@ def run(options):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Deploy/Undeploy GovReadyQ')
-    parser.add_argument('action', help='The action to take (deploy, undeploy)')
+    parser.add_argument('action', help='The action to take (init, deploy, undeploy)')
     parser.add_argument('--config', help='Config file - used to deploy process', required=False)
     parser.add_argument('--type', help="(Optional) Deployment type; It will prompt you if you don't include.",
                         required=False)
     args = vars(parser.parse_args())
 
-    valid_actions = ['deploy', 'undeploy']
+    valid_actions = ['deploy', 'undeploy', 'init']
     if args['action'] not in valid_actions:
         Prompt.error(f"{args['action']} is not a valid choice.  Choices: {valid_actions}", close=True)
 
