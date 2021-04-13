@@ -1,5 +1,5 @@
 # Install (All Cross Platform)
-- `git`
+- `git >= 2.20`
 - `python3`
 
 ## Available Deployments Types

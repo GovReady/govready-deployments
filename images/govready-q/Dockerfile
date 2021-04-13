@@ -45,9 +45,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Upgrade gevent (regularly check if this is still necessary)
 RUN pip3 install gevent==21.1.2
 
-# Fetch vendor resources.
-RUN ./fetch-vendor-resources.sh
-
 # Copy config files
 COPY config/gunicorn.conf.py /etc/opt/gunicorn.conf.py
 
