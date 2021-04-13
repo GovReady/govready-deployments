@@ -30,16 +30,28 @@ The config JSON file will be validated against a deployments `deployments/<deplo
 | `--config <config-file>`                            | JSON formatted file required to deploy                                  |
 | `--type <type>`                                     | (Optional) Skip prompt and provide deployment type                      |
 
-Example: `python run.py deploy --type onprem_simple --config test.json`
+Example: `python run.py deploy --type onprem_simple --config configuration.json`
 
-Example Configuration - `test.json: `
+Example Configuration - `configuration.json: `
 ```json
 {
-  "SECRET_KEY": "2h1_4t$j4ln6k#7k6x+ym@w2x&nomgoxuuw+p82&3mq=c!pyw)",
-  "ADDRESS": "localhost:8000",
-  "ADMINS": [
-    {"username": "username", "email":"first.last@example.com", "password": "REPLACEME"}
-  ]
+    "ADDRESS": "localhost:8000",
+    "ADMINS": [
+      {"username": "username", "email":"first.last@example.com", "password": "REPLACEME"}
+    ],
+    "DATABASE_CONNECTION_STRING": "",
+    "EMAIL_DOMAIN": "",
+    "EMAIL_HOST": "",
+    "EMAIL_PORT": "",
+    "EMAIL_PW": "",
+    "EMAIL_USER": "",
+    "GIT_URL": "",
+    "MAILGUN_API_KEY": "",
+    "MOUNT_FOLDER": "",
+    "NGINX_CERT": "",
+    "NGINX_KEY": "",
+    "SECRET_KEY": "2h1_4t$j4ln6k#7k6x+ym@w2x&nomgoxuuw+p82&3mq=c!pyw)",
+    "VERSION": ""
 }
 ```
 
