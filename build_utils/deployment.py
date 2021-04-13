@@ -4,7 +4,7 @@ import signal
 import subprocess
 import sys
 from abc import ABC
-
+from shutil import copyfile
 from build_utils.prompts import Prompt, Colors
 
 
@@ -13,7 +13,7 @@ class Helper:
         signal.signal(signal.SIGINT, self.signal_handler)
         self.kill_captured = False
 
-    def execute(self, cmd, env_dict, display_stdout=True, on_error_fn=None):
+    def execute(self, cmd, env_dict, display_stdout=True, on_error_fn=None, show_env=False):
         env = os.environ.copy()
         normalized_dict = {}
         for key, value in env_dict.items():
@@ -25,6 +25,8 @@ class Helper:
         env.update(normalized_dict)
         output = []
         Prompt.notice(f"Executing command: {Colors.WARNING}{cmd}")
+        if show_env:
+            Prompt.notice(f"Environment Variables: {json.dumps(env_dict, indent=4, sort_keys=True)}")
         with subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,  # stderr=subprocess.STDOUT,
                               bufsize=0, env=env) as proc:
             for line in proc.stdout:
@@ -44,6 +46,29 @@ class Helper:
             self.kill_captured = True
             self.on_sig_kill()
         sys.exit(0)
+
+    def docker_build_tmp_files_copy(self, docker_tmp_build_files):
+        for tmp_build in docker_tmp_build_files:
+            for key in tmp_build['keys']:
+                file_path = self.config[key]
+                if not os.path.exists(file_path):
+                    Prompt.error(f"{os.path.abspath(file_path)} does not exist.", close=True)
+                dest = os.path.join(self.config['ROOT_DIR'], 'images',
+                                    tmp_build['image'], os.path.basename(file_path))
+                copyfile(file_path, dest)
+                self.config[f"BUILD_FILE_{key}"] = os.path.basename(dest)
+                Prompt.notice(f"Copied build file for image: {tmp_build['image']} - {dest}")
+
+    def docker_build_tmp_files_cleanup(self, docker_tmp_build_files):
+        for tmp_build in docker_tmp_build_files:
+            for key in tmp_build['keys']:
+                file_path = self.config[key]
+                if not os.path.exists(file_path):
+                    Prompt.error(f"{os.path.abspath(file_path)} does not exist.", close=True)
+                dest = os.path.join(self.config['ROOT_DIR'], 'images',
+                                    tmp_build['image'], os.path.basename(file_path))
+                os.remove(dest)
+                Prompt.notice(f"Removed build file for image: {tmp_build['image']} - {dest}")
 
     def on_sig_kill(self):
         raise NotImplementedError()
@@ -71,13 +96,16 @@ class Deployment(Helper, ABC):
             return True
         return False
 
-    def execute(self, cmd, env_dict, display_stdout=True, on_error_fn=None):
-        return super().execute(cmd, env_dict, display_stdout, on_error_fn=self.on_fail)
+    def execute(self, cmd, env_dict=None, display_stdout=True, on_error_fn=None, show_env=False):
+        return super().execute(cmd,
+                               display_stdout=display_stdout,
+                               env_dict=env_dict if env_dict else self.config,
+                               on_error_fn=self.on_fail, show_env=show_env)
 
     def validate(self):
         with open(self.options['config'], 'r') as f:
             self.config = json.load(f)
-
+        self.config['ROOT_DIR'] = os.getcwd()
         missing = []
         for item in self.validation_config:
             if item['key'] not in self.config and item['required']:

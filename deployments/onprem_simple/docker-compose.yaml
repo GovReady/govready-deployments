@@ -65,8 +65,8 @@ services:
       context: ../../images/nginx
       args:
         - HOST=${GOVREADY_Q_HOST-test.example.com}
-        - NGINX_CERT=${NGINX_CERT}
-        - NGINX_KEY=${NGINX_KEY}
+        - NGINX_CERT=${BUILD_FILE_NGINX_CERT}
+        - NGINX_KEY=${BUILD_FILE_NGINX_KEY}
     ports:
       - "80:80"
       - "${GOVREADY_Q_PORT-443}:443"

@@ -8,8 +8,8 @@
   {"key": "VERSION", "required": false, "description":  "GovReady-Q version/tag", "default-message":  "Defaulting to latest release"},
   {"key": "DATABASE_CONNECTION_STRING", "required": false, "description":  "Database connection string: <db_connector>://<name>:<password>@<host>:<port>/<db_name>", "default-message":  "Will create a Postgres server in the docker-compose deployment for you.  It will not have snapshots."},
 
-  {"key": "NGINX_CERT", "required": false, "description":  "Nginx cert.pem", "default-message":  "Defaults to self signed"},
-  {"key": "NGINX_KEY", "required": false, "description":  "Nginx key.pem", "default-message":  "Defaults to self signed"},
+  {"key": "NGINX_CERT", "required": false, "description":  "Full file path to Nginx cert.pem", "default-message":  "Defaults to self signed"},
+  {"key": "NGINX_KEY", "required": false, "description":  "Full file path to Nginx key.pem", "default-message":  "Defaults to self signed"},
 
   {"key": "MAILGUN_API_KEY", "required": false, "description":  "Mailgun is used to submit an incoming email from notifications. ", "default-message":  "No default provided."},
   {"key": "EMAIL_HOST", "required": false, "description":  "Host of Email Server.", "default-message":  "No default provided."},
