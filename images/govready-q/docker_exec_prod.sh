@@ -13,6 +13,8 @@ cat << EOF > local/environment.json
 }
 EOF
 
+# todo - email stuff
+
 #python3 install.py --non-interactive --docker
 echo "[ + ] Running checks"
 python3 manage.py check --deploy

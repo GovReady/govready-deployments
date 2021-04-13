@@ -19,7 +19,7 @@ services:
       - HTTPS=${HTTPS-}
       - SECRET_KEY=${SECRET_KEY-}
       - DEBUG=${DEBUG-}
-      - ADMINS=${ADMINS}
+      - ADMINS=${ADMINS-[]}
       - HEALTH_CHECK_GOVREADY_Q=${HEALTH_CHECK_GOVREADY_Q}
     volumes:
       - ${MOUNT_FOLDER}/govready-q:/var/log

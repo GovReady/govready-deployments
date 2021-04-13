@@ -4,6 +4,7 @@ import signal
 import subprocess
 import sys
 from abc import ABC
+from contextlib import closing
 from shutil import copyfile
 from build_utils.prompts import Prompt, Colors
 
@@ -116,6 +117,8 @@ class Deployment(Helper, ABC):
             elif (item['key'] not in self.config and not item['required']) or (
                     not self.config.get(item['key']) and not item['required']):
                 self.config[item['key']] = os.environ.get(item['key'])
+                if not self.config[item['key']]:
+                    self.config[item['key']] = ""
                 warning = f"Config missing optional field: {item['key']} - {Colors.WARNING}{item['description']}"
                 if item.get('default-message'):
                     warning += f" - {Colors.CYAN}{item['default-message']}"
@@ -123,6 +126,17 @@ class Deployment(Helper, ABC):
         if missing:
             missing_formatted = [f"{x['key']}: {x['description']}" for x in missing]
             Prompt.error(f"The following keys are missing from your config file: {missing_formatted}", close=True)
+
+    def check_ports(self, ports):
+        Prompt.notice(f"Checking if ports are available for deployment: {ports}")
+        import socket
+        ports_in_use = []
+        for port in ports:
+            with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+                if sock.connect_ex(('127.0.0.1', port)) == 0:
+                    ports_in_use.append(port)
+        if ports_in_use:
+            Prompt.error(f"Cannot deploy.  The following ports are in use: {ports_in_use}", close=True)
 
     def run(self):
         raise NotImplementedError()
