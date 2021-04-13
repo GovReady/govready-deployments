@@ -52,7 +52,7 @@ RUN ./fetch-vendor-resources.sh
 COPY config/gunicorn.conf.py /etc/opt/gunicorn.conf.py
 
 # Copy utility scripts
-COPY dockerfile_exec.py first_run.sh docker_exec_prod.sh docker_exec_prod_email_notifications.sh /usr/local/bin/
+COPY dockerfile_exec.py first_run.sh docker_exec_prod.sh docker_exec_prod_email_notifications.sh docker_exec_write_environment.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker_exec*.sh
 
 # This directory must be present for the AppSource created by our

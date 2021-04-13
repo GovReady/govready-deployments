@@ -16,5 +16,10 @@
   {"key": "EMAIL_PORT", "required": false, "description":  "Port of Email Server.", "default-message":  "No default provided."},
   {"key": "EMAIL_USER", "required": false, "description":  "User for the Email Server.", "default-message":  "No default provided."},
   {"key": "EMAIL_PW", "required": false, "description":  "Password for the User for of Email Server.", "default-message":  "No default provided."},
-  {"key": "EMAIL_DOMAIN", "required": false, "description":  "Domain of the Email Server.", "default-message": "No default provided."}
+  {"key": "EMAIL_DOMAIN", "required": false, "description":  "Domain of the Email Server.", "default-message": "No default provided."},
+  {"key": "BRANDING", "required": false, "description":  "GovReady-Q branding.", "default-message": "GovReady default branding will be used."},
+  {"key": "PROXY_AUTHENTICATION_USER_HEADER", "required": false, "description":  "Proxy Authentication User header.", "default-message": "No default provided."},
+  {"key": "PROXY_AUTHENTICATION_EMAIL_HEADER", "required": false, "description":  "Proxy Authentication Email header.", "default-message": "No default provided."},
+  {"key": "GR_PDF_GENERATOR", "required": false, "description":  "PDF generator binary name.", "default-message": "Using system default."},
+  {"key": "GR_IMG_GENERATOR", "required": false, "description":  "IMG generator binary name.", "default-message": "Using system default."}
 ]
