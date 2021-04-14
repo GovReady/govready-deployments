@@ -5,11 +5,11 @@ import subprocess
 import sys
 from abc import ABC
 from contextlib import closing
-from shutil import copyfile
+from shutil import copyfile, make_archive, rmtree
 from build_utils.prompts import Prompt, Colors
 
 
-class Helper:
+class HelperMixin:
     def __init__(self):
         signal.signal(signal.SIGINT, self.signal_handler)
         self.kill_captured = False
@@ -45,33 +45,43 @@ class Helper:
         Prompt.notice("\nCtrl-c captured.  Executing teardown function.")
         if not self.kill_captured:
             self.kill_captured = True
+            self.cleanup()
             self.on_sig_kill()
         sys.exit(0)
 
-    def docker_build_tmp_files_copy(self, docker_tmp_build_files):
+    def docker_tmp_file_handler(self, config, docker_tmp_build_files, copy=True):
         for tmp_build in docker_tmp_build_files:
             for key in tmp_build['keys']:
-                file_path = self.config[key]
+                file_path = config[key]
                 if file_path:
                     if not os.path.exists(file_path):
                         Prompt.error(f"{os.path.abspath(file_path)} does not exist.", close=True)
-                    dest = os.path.join(self.config['ROOT_DIR'], 'images',
-                                        tmp_build['image'], os.path.basename(file_path))
-                    copyfile(file_path, dest)
-                    self.config[f"BUILD_FILE_{key}"] = os.path.basename(dest)
-                    Prompt.notice(f"Copied build file for image: {tmp_build['image']} - {dest}")
+                    base_path = os.path.join(config['ROOT_DIR'], 'images', tmp_build['image'])
+                    if copy:
+                        self.__docker_build_tmp_files_copy(base_path, file_path, tmp_build, config, key)
+                    else:
+                        self.__docker_build_tmp_files_cleanup(base_path, file_path, tmp_build)
 
-    def docker_build_tmp_files_cleanup(self, docker_tmp_build_files):
-        for tmp_build in docker_tmp_build_files:
-            for key in tmp_build['keys']:
-                file_path = self.config[key]
-                if file_path:
-                    if not os.path.exists(file_path):
-                        Prompt.error(f"{os.path.abspath(file_path)} does not exist.", close=True)
-                    dest = os.path.join(self.config['ROOT_DIR'], 'images',
-                                        tmp_build['image'], os.path.basename(file_path))
-                    os.remove(dest)
-                    Prompt.notice(f"Removed build file for image: {tmp_build['image']} - {dest}")
+    def __docker_build_tmp_files_copy(self, base_path, file_path, tmp_build, config, key):
+        if os.path.isdir(file_path):
+            dest = make_archive(os.path.join(base_path, os.path.basename(file_path)), 'zip', file_path)
+            config[f"BUILD_FILE_{key}"] = f"{os.path.basename(file_path)}.zip"
+        else:
+            dest = os.path.join(base_path, os.path.basename(file_path))
+            copyfile(file_path, dest)
+            config[f"BUILD_FILE_{key}"] = os.path.basename(dest)
+        Prompt.notice(f"Copied build file for image: {tmp_build['image']} - {dest}")
+
+    def __docker_build_tmp_files_cleanup(self, base_path, file_path, tmp_build):
+        if os.path.isdir(file_path):
+            dest = os.path.join(base_path, f"{os.path.basename(file_path)}.zip")
+        else:
+            dest = os.path.join(base_path, os.path.basename(file_path))
+        os.remove(dest)
+        Prompt.notice(f"Removed build artifact for image: {tmp_build['image']} - {dest}")
+
+    def cleanup(self):
+        self.docker_tmp_file_handler(self.config, self.TMP_BUILD_FILES, copy=False)
 
     def on_sig_kill(self):
         raise NotImplementedError()
@@ -83,7 +93,11 @@ class Helper:
         raise NotImplementedError()
 
 
-class Deployment(Helper, ABC):
+class Deployment(HelperMixin, ABC):
+    # Use this for intermediary files for the Docker build process in the Dockerfile
+    TMP_BUILD_FILES = []  # Brings in files/directories
+    REQUIRED_PORTS = []  # Verifies to see if ports are available
+
     def __init__(self, options, validator_json_file):
         super().__init__()
         self.options = options
@@ -98,6 +112,9 @@ class Deployment(Helper, ABC):
             self.config[variable] = default
             return True
         return False
+
+    def docker_build_tmp_files(self, docker_tmp_build_files):
+        return super().docker_tmp_file_handler(self.config, docker_tmp_build_files)
 
     def execute(self, cmd, env_dict=None, display_stdout=True, on_error_fn=None, show_env=False):
         return super().execute(cmd,
@@ -127,11 +144,14 @@ class Deployment(Helper, ABC):
             missing_formatted = [f"{x['key']}: {x['description']}" for x in missing]
             Prompt.error(f"The following keys are missing from your config file: {missing_formatted}", close=True)
 
-    def check_ports(self, ports):
-        Prompt.notice(f"Checking if ports are available for deployment: {ports}")
+        # Prepares build files if provided
+        super().docker_tmp_file_handler(self.config, self.TMP_BUILD_FILES)
+
+    def check_ports(self):
+        Prompt.notice(f"Checking if ports are available for deployment: {self.REQUIRED_PORTS}")
         import socket
         ports_in_use = []
-        for port in ports:
+        for port in self.REQUIRED_PORTS:
             with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
                 if sock.connect_ex(('127.0.0.1', port)) == 0:
                     ports_in_use.append(port)
@@ -142,7 +162,7 @@ class Deployment(Helper, ABC):
         raise NotImplementedError()
 
 
-class UnDeploy(Helper, ABC):
+class UnDeploy(HelperMixin, ABC):
 
     def __init__(self, options):
         super().__init__()

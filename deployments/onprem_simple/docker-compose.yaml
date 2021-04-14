@@ -12,6 +12,7 @@ services:
       args:
         - VERSION=${VERSION}
         - GIT_URL=${GIT_URL}
+        - BUILD_FILE_BRANDING=${BUILD_FILE_BRANDING-}
     command: /bin/bash -c docker_exec_prod.sh
     environment:
       - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING-}
@@ -54,6 +55,7 @@ services:
       args:
         - VERSION=${VERSION}
         - GIT_URL=${GIT_URL}
+        - BUILD_FILE_BRANDING=${BUILD_FILE_BRANDING-}
     command: /bin/bash -c docker_exec_prod_email_notifications.sh
     environment:
       - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING-}

@@ -35,9 +35,18 @@ WORKDIR /opt
 
 ARG VERSION
 ARG GIT_URL
-RUN git clone --depth 1 --branch ${VERSION} ${GIT_URL}
+# Defaults to latest Release if Tag/Branch not provided
+RUN if [ "$VERSION" = "" ]; then \
+        git -c versionsort.suffix=- ls-remote --tags --sort=v:refname $GIT_URL | tail --lines=1 | cut --delimiter='/' --fields=3 > /tmp/version.txt; \
+    else \
+        echo $VERSION > /tmp/version.txt; \
+  fi
+RUN git clone --depth 1 --branch $(cat /tmp/version.txt) ${GIT_URL}
 
 WORKDIR /opt/govready-q
+
+ARG BUILD_FILE_BRANDING
+COPY *${BUILD_FILE_BRANDING} /tmp/
 
 # Install Python requirements.
 RUN pip3 install --no-cache-dir -r requirements.txt

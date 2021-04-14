@@ -37,7 +37,10 @@ fi
 
 # Overridden branding.
 if [[ ! -z "${BRANDING-}" ]]; then
-	set_env_setting branding "$BRANDING"
+    ls /tmp
+    name=$(basename "$BRANDING" | cut -d. -f1)
+    unzip "/tmp/$name" -d "/opt/govready-q/$name"
+	set_env_setting branding "$name"
 fi
 
 # Enterprise login settings.
