@@ -1,6 +1,7 @@
 import os
-
+import re
 from build_utils.deployment import Deployment
+from build_utils.prompts import Prompt, Colors
 
 
 class OnPremiseSimpleDeployment(Deployment):
@@ -15,7 +16,14 @@ class OnPremiseSimpleDeployment(Deployment):
         self.on_sig_kill()
 
     def on_complete(self):
-        self.execute(cmd=f"docker-compose logs")
+        logs = self.execute(cmd=f"docker-compose logs", display_stdout=False)
+        auto_admin = re.findall('Created administrator account \(username: (admin)\) with password: (.*?)\x1b', logs)
+        print()
+
+        if auto_admin:
+            Prompt.warning(f"Created Administrator Account - {Colors.CYAN}{auto_admin[0][0]} / {auto_admin[0][1]} - {Colors.FAIL} This is the only time you will see this message so make sure to write this down!")
+
+        Prompt.warning(f"Access application via Browser: {Colors.CYAN}https://{self.config['HOST']}")
 
     def on_sig_kill(self):
         self.execute(cmd="docker-compose down --remove-orphans  --rmi all")
@@ -30,11 +38,12 @@ class OnPremiseSimpleDeployment(Deployment):
         self.set_default('HEALTH_CHECK_GOVREADY_Q', f"http://{self.config['HOST']}:8000")
         using_internal_db = self.set_default('DATABASE_CONNECTION_STRING',
                                              "postgres://postgres:PASSWORD@postgres:5432/govready_q")
+        self.set_default('DB_ENGINE', self.config['DATABASE_CONNECTION_STRING'].split(':')[0])
         docker_compose_file = "docker-compose.yaml"
         if not using_internal_db:
             docker_compose_file = 'docker-compose.external-db.yaml'
 
         self.execute(cmd=f"docker-compose -f {docker_compose_file} down --remove-orphans  --rmi all")
         self.check_ports()
-        self.execute(cmd=f"docker-compose -f {docker_compose_file} build", show_env=True)
+        self.execute(cmd=f"docker-compose -f {docker_compose_file} build --parallel", show_env=True)
         self.execute(cmd=f"docker-compose -f {docker_compose_file} up -d", show_env=True)

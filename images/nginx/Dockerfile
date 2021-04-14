@@ -10,10 +10,8 @@ RUN \
 ARG NGINX_CERT
 ARG NGINX_KEY
 
-COPY *${NGINX_CERT} /etc/pki/tls/certs/
-COPY *${NGINX_KEY} /etc/pki/tls/private/
-
-RUN ls /etc/pki/tls/certs/
+COPY ${NGINX_CERT}* /etc/pki/tls/certs/
+COPY ${NGINX_KEY}* /etc/pki/tls/private/
 
 RUN if [ "$NGINX_CERT" = "" ]; then \
     apk add --no-cache --update openssl \

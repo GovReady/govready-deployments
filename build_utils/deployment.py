@@ -5,7 +5,7 @@ import subprocess
 import sys
 from abc import ABC
 from contextlib import closing
-from shutil import copyfile, make_archive, rmtree
+from shutil import copyfile, make_archive
 from build_utils.prompts import Prompt, Colors
 
 
@@ -24,7 +24,7 @@ class HelperMixin:
                 value = ""
             normalized_dict[key] = value
         env.update(normalized_dict)
-        output = []
+        output = ""
         Prompt.notice(f"Executing command: {Colors.WARNING}{cmd}")
         if show_env:
             Prompt.notice(f"Environment Variables: {json.dumps(env_dict, indent=4, sort_keys=True)}")
@@ -32,7 +32,7 @@ class HelperMixin:
                               bufsize=0, env=env) as proc:
             for line in proc.stdout:
                 formatted = line.rstrip().decode()
-                output.append(formatted)
+                output += formatted
                 if display_stdout:
                     print(formatted)
         if proc.returncode != 0:
@@ -81,7 +81,8 @@ class HelperMixin:
         Prompt.notice(f"Removed build artifact for image: {tmp_build['image']} - {dest}")
 
     def cleanup(self):
-        self.docker_tmp_file_handler(self.config, self.TMP_BUILD_FILES, copy=False)
+        if hasattr(self, 'config'):
+            self.docker_tmp_file_handler(self.config, self.TMP_BUILD_FILES, copy=False)
 
     def on_sig_kill(self):
         raise NotImplementedError()
@@ -120,7 +121,7 @@ class Deployment(HelperMixin, ABC):
         return super().execute(cmd,
                                display_stdout=display_stdout,
                                env_dict=env_dict if env_dict else self.config,
-                               on_error_fn=self.on_fail, show_env=show_env)
+                               on_error_fn=on_error_fn if on_error_fn else self.on_fail, show_env=show_env)
 
     def validate(self):
         with open(self.options['config'], 'r') as f:
@@ -128,21 +129,23 @@ class Deployment(HelperMixin, ABC):
         self.config['ROOT_DIR'] = os.getcwd()
         missing = []
         for item in self.validation_config:
-            if (item['key'] not in self.config and item['required']) or \
-                    (not self.config.get(item['key']) and item['required']):
+            key = item['key']
+            required = item['required']
+            key_found = key in self.config or key in os.environ
+
+            if not self.config.get(key):
+                self.config[key] = os.environ.get(key, "")
+            if (not key_found and required) or (key_found and required and not self.config[key]):
                 missing.append(item)
-            elif (item['key'] not in self.config and not item['required']) or (
-                    not self.config.get(item['key']) and not item['required']):
-                self.config[item['key']] = os.environ.get(item['key'])
-                if not self.config[item['key']]:
-                    self.config[item['key']] = ""
-                warning = f"Config missing optional field: {item['key']} - {Colors.WARNING}{item['description']}"
+            elif not required and not self.config[key]:
+                warning = f"Config missing optional field: {key} - {Colors.WARNING}{item['description']}"
                 if item.get('default-message'):
                     warning += f" - {Colors.CYAN}{item['default-message']}"
                 Prompt.notice(warning)
         if missing:
             missing_formatted = [f"{x['key']}: {x['description']}" for x in missing]
-            Prompt.error(f"The following keys are missing from your config file: {missing_formatted}", close=True)
+            Prompt.error(f"The following keys are missing/empty from your env or config file: {missing_formatted}",
+                         close=True)
 
         # Prepares build files if provided
         super().docker_tmp_file_handler(self.config, self.TMP_BUILD_FILES)
@@ -172,4 +175,7 @@ class UnDeploy(HelperMixin, ABC):
         raise NotImplementedError()
 
     def execute(self, cmd, env_dict=None, display_stdout=True, on_error_fn=None, show_env=False):
-        return super().execute(cmd, env_dict, display_stdout, on_error_fn=self.on_fail, show_env=show_env)
+        if env_dict is None:
+            env_dict = {}
+        return super().execute(cmd, env_dict, display_stdout, on_error_fn=on_error_fn if on_error_fn else self.on_fail,
+                               show_env=show_env)

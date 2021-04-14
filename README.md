@@ -1,13 +1,15 @@
 # Install (All Cross Platform)
 - `python3`
+- See specific deployment `README.md` for their dependencies
 
 ## Available Deployments Types
-| Provider                       | Stable Implementation                                                             |
-|--------------------------------|-------------------------------------------------------------------------|
-| Amazon Web Service             | No                                                                      |
-| Microsoft Azure                | No                                                                      |
-| On Prem - Distributed          | No                                                                      |
-| On Prem - Simple               | Yes                                                                     |
+| Deployment Type       | Stable | Link to Deployment                                    |
+|-----------------------|--------|-------------------------------------------------------|
+| On Prem - Simple      | ✔      | [Documentation](deployments/onprem_simple/README.md) |
+| On Prem - Distributed | ❌      | [Documentation](deployments/onprem_distributed/README.md) |
+| Amazon Web Service    | ❌      | [Documentation](deployments/aws/README.md) |
+| Microsoft Azure       | ❌      | [Documentation](deployments/azure/README.md) |
+| Google Cloud Platform | ❌      | [Documentation](deployments/gcp/README.md) |
 
 ## Code Structure
 Deployments are python modules that reside in `deployments`.  Each deployment module will have the following:
@@ -19,10 +21,15 @@ Deployments are python modules that reside in `deployments`.  Each deployment mo
 #### Init
 This will generate a skeleton JSON configuration file for the deployment you choose to use.  It will output `deployment.json` to be used for specified deployment.
 
-Example: `python run.py init`
+Example: `python run.py init` or `python run.py init --type onprem_simple`
 
 #### Deploy
-The config JSON file will be validated against a deployments `deployments/<deployment_type>/config-validator.json`.  Make sure the provided configuration file has all the required keys and optional keys if you want to override the defaults.
+For a deployment to run, it must have the contents of `deployments/<deployment_type>/config-validator.json` satisfied.
+To satisfy those requirements you can:
+- Set Environment variables that match the keys from the `config-validator.json`
+- Set values in the configuration file created via the `init`.
+
+If both the configuration file and the environment variables are set, the configuration file takes precedence.
 
 | Arguments & Flags                                   | Description                                                             |
 |-----------------------------------------------------|-------------------------------------------------------------------------|
@@ -30,29 +37,6 @@ The config JSON file will be validated against a deployments `deployments/<deplo
 | `--type <type>`                                     | (Optional) Skip prompt and provide deployment type                      |
 
 Example: `python run.py deploy --type onprem_simple --config configuration.json`
-
-Example Configuration - `configuration.json: `
-```json
-{
-    "ADDRESS": "localhost:8000",
-    "ADMINS": [
-      {"username": "username", "email":"first.last@example.com", "password": "REPLACEME"}
-    ],
-    "DATABASE_CONNECTION_STRING": "",
-    "EMAIL_DOMAIN": "",
-    "EMAIL_HOST": "",
-    "EMAIL_PORT": "",
-    "EMAIL_PW": "",
-    "EMAIL_USER": "",
-    "GIT_URL": "",
-    "MAILGUN_API_KEY": "",
-    "MOUNT_FOLDER": "",
-    "NGINX_CERT": "",
-    "NGINX_KEY": "",
-    "SECRET_KEY": "2h1_4t$j4ln6k#7k6x+ym@w2x&nomgoxuuw+p82&3mq=c!pyw)",
-    "VERSION": ""
-}
-```
 
 
 #### Remove Deployment
@@ -65,3 +49,6 @@ Tears down deployment provided.
 Example: `python run.py undeploy --type onprem_simple`
 
 
+## Database Support
+- PostgreSQL
+- MySQL

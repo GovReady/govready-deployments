@@ -1,7 +1,7 @@
 from build_utils.deployment import Deployment
 
 
-class OnPremiseDistributedDeployment(Deployment):
+class GCPDeployment(Deployment):
 
     def on_sig_kill(self):
         pass

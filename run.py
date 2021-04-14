@@ -41,8 +41,10 @@ def run(options):
         deployment = deployment_classes[0](options, validator_config)
         deployment.validate()
         os.chdir(f"deployments/{options['type']}")
-        deployment.run()
-        deployment.cleanup()
+        try:
+            deployment.run()
+        finally:
+            deployment.cleanup()
         deployment.on_complete()
         Prompt.success(f"Deployment complete - using the [{options['type']}] method")
     else:
@@ -51,8 +53,11 @@ def run(options):
             Prompt.error(f"Unable to find class inheriting `UnDeploy` in {path}", close=True)
         remove_deployment = deployment_classes[0](options)
         os.chdir(f"deployments/{options['type']}")
-        remove_deployment.run()
-        remove_deployment.cleanup()
+        try:
+            remove_deployment.run()
+        finally:
+            remove_deployment.cleanup()
+
         remove_deployment.on_complete()
         Prompt.success(f"Deployment removed - using the [{options['type']}] method")
 

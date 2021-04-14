@@ -1,7 +1,7 @@
 from build_utils.deployment import UnDeploy
 
 
-class OnPremiseDistributedRemoveDeployment(UnDeploy):
+class GCPRemoveDeployment(UnDeploy):
 
     def on_fail(self):
         pass

@@ -2,7 +2,6 @@
 
 /usr/local/bin/docker_exec_write_environment.sh
 
-#python3 install.py --non-interactive --docker
 echo "[ + ] Running checks"
 python3 manage.py check --deploy
 

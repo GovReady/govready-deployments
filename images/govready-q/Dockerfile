@@ -50,7 +50,11 @@ COPY *${BUILD_FILE_BRANDING} /tmp/
 
 # Install Python requirements.
 RUN pip3 install --no-cache-dir -r requirements.txt
-
+ARG DB_ENGINE
+RUN if [ "$DB_ENGINE" = "mysql" ]; then \
+        apt-get install -y libmysqlclient-dev \
+        && pip3 install --no-cache-dir -r requirements_mysql.txt; \
+  fi
 # Upgrade gevent (regularly check if this is still necessary)
 RUN pip3 install gevent==21.1.2
 
