@@ -1,4 +1,4 @@
-# Install (All Cross Platform)
+## Dependencies (Install beforehand)
 - `python3`
 - See specific deployment `README.md` for their dependencies
 
