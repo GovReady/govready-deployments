@@ -1,6 +1,13 @@
 # About
 This is a docker-compose implementation.  It is not distributed in nature and is not meant as a scalable/reliable solution.  It is meant to get the stack up and running for demo or small scale deployments.
 
+
+## Dependencies
+Make sure you have the following installed:
+- `docker` (Make sure the engine is running after the install)
+- `docker-compose`
+
+
 ## Configuration File
 | Key                               | Required | Description                                                                                                           | Default message                                                                                      |
 | --------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
@@ -28,8 +35,8 @@ This is a docker-compose implementation.  It is not distributed in nature and is
 To build an empty configuration file use `python run.py init` at the root of the project.
 
 ## Local Database
-The local database is persisted in a Docker Volume called `onprem_simple_pg-data`
+The local database is persisted in a Docker Volume called `onprem_pg-data`
 
 #### Wipe
 - Remove existing docker build - then:
-- `docker volume rm onprem_simple_pg-data`
+- `docker volume rm onprem_pg-data`

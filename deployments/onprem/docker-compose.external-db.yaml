@@ -5,7 +5,7 @@ networks:
 
 services:
   govready-q:
-    container_name: govready_q
+    container_name: govready_q_service
     build:
       context: ../../images/govready-q
       dockerfile: Dockerfile
@@ -46,7 +46,7 @@ services:
       - q_network
 
   govready-q-email-notifications:
-    container_name: govready_q_email_notifications
+    container_name: govready_q_email_notifications_service
     build:
       context: ../../images/govready-q
       dockerfile: Dockerfile
@@ -83,7 +83,7 @@ services:
       - q_network
 
   nginx:
-    container_name: nginx
+    container_name: nginx_service
     build:
       context: ../../images/nginx
       args:

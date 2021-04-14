@@ -4,7 +4,7 @@ from build_utils.deployment import Deployment
 from build_utils.prompts import Prompt, Colors
 
 
-class OnPremiseSimpleDeployment(Deployment):
+class OnPremiseDeployment(Deployment):
     TMP_BUILD_FILES = [
         {"image": 'nginx', "keys": ['NGINX_CERT', 'NGINX_KEY']},
         {"image": 'govready-q', "keys": ['BRANDING']},
