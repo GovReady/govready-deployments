@@ -22,7 +22,7 @@ class OnPremiseDeployment(Deployment):
 
         if auto_admin:
             Prompt.warning(f"Created Administrator Account - {Colors.CYAN}{auto_admin[0][0]} / {auto_admin[0][1]} - {Colors.FAIL} This is the only time you will see this message so make sure to write this down!")
-
+        Prompt.warning(f"Logs & Container Artifacts can be found in: {Colors.CYAN}{self.config['MOUNT_FOLDER']}")
         Prompt.warning(f"Access application via Browser: {Colors.CYAN}https://{self.config['HOST']}")
 
     def on_sig_kill(self):
