@@ -34,8 +34,14 @@ class OnPremiseDeployment(Deployment):
         self.set_default('MOUNT_FOLDER', os.path.abspath("../../volumes"))
         self.set_default('HTTPS', "true")
         self.set_default('DEBUG', "false")
+
+        if self.check_if_valid_uri(self.config['ADDRESS']):
+            Prompt.error(f"ADDRESS cannot be a valid URI.  It must be the <domain>:<port> only.  No protocol or path.  "
+                         f"{self.config['ADDRESS']} is invalid.", close=True)
+
         self.set_default('HOST', self.config['ADDRESS'].split(':')[0])
         self.set_default('HEALTH_CHECK_GOVREADY_Q', f"http://{self.config['HOST']}:8000")
+
         using_internal_db = self.set_default('DATABASE_CONNECTION_STRING',
                                              "postgres://postgres:PASSWORD@postgres:5432/govready_q")
         self.set_default('DB_ENGINE', self.config['DATABASE_CONNECTION_STRING'].split(':')[0])

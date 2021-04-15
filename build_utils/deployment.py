@@ -6,6 +6,8 @@ import sys
 from abc import ABC
 from contextlib import closing
 from shutil import copyfile, make_archive
+from urllib.parse import urlparse
+
 from build_utils.prompts import Prompt, Colors
 
 
@@ -13,6 +15,13 @@ class HelperMixin:
     def __init__(self):
         signal.signal(signal.SIGINT, self.signal_handler)
         self.kill_captured = False
+
+    def check_if_valid_uri(self, x):
+        try:
+            result = urlparse(x)
+            return all([result.scheme, result.netloc])
+        except:
+            return False
 
     def execute(self, cmd, env_dict, display_stdout=True, on_error_fn=None, show_env=False):
         env = os.environ.copy()
