@@ -5,3 +5,4 @@ __pycache__
 deployment.json
 volumes
 *.pem
+configuration.json

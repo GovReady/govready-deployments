@@ -21,7 +21,7 @@ def run(options):
         with open(validator_config, 'r') as f:
             for row in json.load(f):
                 skeleton[row['key']] = ""
-        with open("deployment.json", 'w') as f:
+        with open("configuration.json", 'w') as f:
             json.dump(skeleton, f, indent=4, sort_keys=True)
         return
 
@@ -74,8 +74,8 @@ if __name__ == '__main__':
     if args['action'] not in valid_actions:
         Prompt.error(f"{args['action']} is not a valid choice.  Choices: {valid_actions}", close=True)
 
-    deployment_types = [y for y in [x[0].split(os.path.sep)[-1] for x in os.walk('deployments')][1:] if
-                        not y.startswith('__')]
+    deployment_types = sorted([y for y in [x[0].split(os.path.sep)[-1] for x in os.walk('deployments')][1:] if
+                               not y.startswith('__')])
     if not args['type']:
         args['type'] = get_deployment_type(deployment_types)
     if args['type'] not in deployment_types:
