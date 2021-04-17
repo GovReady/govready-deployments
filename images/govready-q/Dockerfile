@@ -55,6 +55,15 @@ RUN if [ "$DB_ENGINE" = "mysql" ]; then \
         apt-get install -y libmysqlclient-dev \
         && pip3 install --no-cache-dir -r requirements_mysql.txt; \
   fi
+
+ARG GR_PDF_GENERATOR
+ARG GR_IMG_GENERATOR
+RUN if [ "$GR_PDF_GENERATOR" = "wkhtmltopdf" ] || [ "$GR_IMG_GENERATOR" = "wkhtmltopdf" ]; then \
+        apt-get -y install wget \
+        && wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb \
+        && apt install -y ./wkhtmltox_0.12.6-1.focal_amd64.deb; \
+  fi
+
 # Upgrade gevent (regularly check if this is still necessary)
 RUN pip3 install gevent==21.1.2
 

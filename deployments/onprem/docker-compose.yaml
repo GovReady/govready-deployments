@@ -14,6 +14,8 @@ services:
         - GIT_URL=${GIT_URL}
         - BUILD_FILE_BRANDING=${BUILD_FILE_BRANDING-}
         - DB_ENGINE=${DB_ENGINE-}
+        - GR_PDF_GENERATOR=${GR_PDF_GENERATOR-}
+        - GR_IMG_GENERATOR=${GR_IMG_GENERATOR-}
     command: /bin/bash -c docker_exec_prod.sh
     environment:
       - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING-}

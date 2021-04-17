@@ -19,7 +19,7 @@ Deployments are python modules that reside in `deployments`.  Each deployment mo
 
 ## Run
 #### Init
-This will generate a skeleton JSON configuration file for the deployment you choose to use.  It will output `deployment.json` to be used for specified deployment.
+This will generate a skeleton JSON configuration file for the deployment you choose to use.  It will output `configuration.json` to be used for specified deployment.
 
 Example: `python run.py init` or `python run.py init --type onprem`
 
