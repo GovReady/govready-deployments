@@ -1,0 +1,8 @@
+.env
+__pycache__
+*.pyc
+.idea
+deployment.json
+volumes
+*.pem
+configuration.json

@@ -1,0 +1,132 @@
+version: '3'
+networks:
+  q_network:
+    driver: bridge
+
+services:
+  govready-q:
+    container_name: govready_q_service
+    build:
+      context: ../../images/govready-q
+      dockerfile: Dockerfile
+      args:
+        - VERSION=${VERSION}
+        - GIT_URL=${GIT_URL}
+        - BUILD_FILE_BRANDING=${BUILD_FILE_BRANDING-}
+        - DB_ENGINE=${DB_ENGINE-}
+        - GR_PDF_GENERATOR=${GR_PDF_GENERATOR-}
+        - GR_IMG_GENERATOR=${GR_IMG_GENERATOR-}
+    command: /bin/bash -c docker_exec_prod.sh
+    environment:
+      - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING-}
+      - ADDRESS=${ADDRESS-}
+      - HTTPS=${HTTPS-}
+      - SECRET_KEY=${SECRET_KEY-}
+      - DEBUG=${DEBUG-}
+      - ADMINS=${ADMINS-[]}
+      - HEALTH_CHECK_GOVREADY_Q=${HEALTH_CHECK_GOVREADY_Q}
+      - EMAIL_HOST=${EMAIL_HOST-}
+      - EMAIL_PORT=${EMAIL_PORT-}
+      - EMAIL_PW=${EMAIL_PW-}
+      - EMAIL_DOMAIN=${EMAIL_DOMAIN-}
+      - MAILGUN_API_KEY=${MAILGUN_API_KEY-}
+      - BRANDING=${BRANDING-}
+      - PROXY_AUTHENTICATION_USER_HEADER=${PROXY_AUTHENTICATION_USER_HEADER-}
+      - PROXY_AUTHENTICATION_EMAIL_HEADER=${PROXY_AUTHENTICATION_EMAIL_HEADER-}
+      - GR_PDF_GENERATOR=${GR_PDF_GENERATOR-}
+      - GR_IMG_GENERATOR=${GR_IMG_GENERATOR-}
+    volumes:
+      - ${MOUNT_FOLDER}/govready-q:/var/log
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail -s $$HEALTH_CHECK_GOVREADY_Q || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 15
+    networks:
+      - q_network
+
+  govready-q-email-notifications:
+    container_name: govready_q_email_notifications_service
+    build:
+      context: ../../images/govready-q
+      dockerfile: Dockerfile
+      args:
+        - VERSION=${VERSION}
+        - GIT_URL=${GIT_URL}
+        - BUILD_FILE_BRANDING=${BUILD_FILE_BRANDING-}
+        - DB_ENGINE=${DB_ENGINE-}
+    command: /bin/bash -c docker_exec_prod_email_notifications.sh
+    environment:
+      - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING-}
+      - ADDRESS=${ADDRESS-}
+      - HTTPS=${HTTPS-}
+      - SECRET_KEY=${SECRET_KEY-}
+      - DEBUG=${DEBUG-}
+      - ADMINS=${ADMINS-[]}
+      - HEALTH_CHECK_GOVREADY_Q=${HEALTH_CHECK_GOVREADY_Q}
+      - EMAIL_HOST=${EMAIL_HOST-}
+      - EMAIL_PORT=${EMAIL_PORT-}
+      - EMAIL_PW=${EMAIL_PW-}
+      - EMAIL_DOMAIN=${EMAIL_DOMAIN-}
+      - MAILGUN_API_KEY=${MAILGUN_API_KEY-}
+      - BRANDING=${BRANDING-}
+      - PROXY_AUTHENTICATION_USER_HEADER=${PROXY_AUTHENTICATION_USER_HEADER-}
+      - PROXY_AUTHENTICATION_EMAIL_HEADER=${PROXY_AUTHENTICATION_EMAIL_HEADER-}
+      - GR_PDF_GENERATOR=${GR_PDF_GENERATOR-}
+      - GR_IMG_GENERATOR=${GR_IMG_GENERATOR-}
+    volumes:
+      - ${MOUNT_FOLDER}/govready-q-email-notifications:/var/log
+    depends_on:
+      govready-q:
+        condition: service_healthy
+    networks:
+      - q_network
+
+  nginx:
+    container_name: nginx_service
+    build:
+      context: ../../images/nginx
+      args:
+        - HOST=${GOVREADY_Q_HOST-test.example.com}
+        - NGINX_CERT=${BUILD_FILE_NGINX_CERT}
+        - NGINX_KEY=${BUILD_FILE_NGINX_KEY}
+    ports:
+      - "80:80"
+      - "${GOVREADY_Q_PORT-443}:443"
+    depends_on:
+      govready-q:
+        condition: service_healthy
+    networks:
+      - q_network
+
+  postgres:
+    container_name: postgres
+    image: postgres:13.2-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - type: volume
+        source: pg-data
+        target: /pg-data
+        volume:
+          nocopy: false
+    environment:
+      POSTGRES_DB: govready_q
+      POSTGRES_PASSWORD: PASSWORD
+      POSTGRES_HOST_AUTH_METHOD: trust
+      PGDATA: /pg-data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - q_network
+
+volumes:
+   pg-data:

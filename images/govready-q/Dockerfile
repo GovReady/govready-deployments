@@ -32,23 +32,47 @@ RUN apt-get -y install \
 
 # Install GovReady application.
 WORKDIR /opt
-RUN git clone https://github.com/GovReady/govready-q.git
+
+ARG VERSION
+ARG GIT_URL
+# Defaults to latest Release if Tag/Branch not provided
+RUN if [ "$VERSION" = "" ]; then \
+        git -c versionsort.suffix=- ls-remote --tags --sort=v:refname $GIT_URL | tail --lines=1 | cut --delimiter='/' --fields=3 > /tmp/version.txt; \
+    else \
+        echo $VERSION > /tmp/version.txt; \
+  fi
+RUN git clone --depth 1 --branch $(cat /tmp/version.txt) ${GIT_URL}
+
 WORKDIR /opt/govready-q
+
+ARG BUILD_FILE_BRANDING
+COPY *${BUILD_FILE_BRANDING} /tmp/
 
 # Install Python requirements.
 RUN pip3 install --no-cache-dir -r requirements.txt
+ARG DB_ENGINE
+RUN if [ "$DB_ENGINE" = "mysql" ]; then \
+        apt-get install -y libmysqlclient-dev \
+        && pip3 install --no-cache-dir -r requirements_mysql.txt; \
+  fi
+
+ARG GR_PDF_GENERATOR
+ARG GR_IMG_GENERATOR
+RUN if [ "$GR_PDF_GENERATOR" = "wkhtmltopdf" ] || [ "$GR_IMG_GENERATOR" = "wkhtmltopdf" ]; then \
+        apt-get -y install wget \
+        && wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb \
+        && apt install -y ./wkhtmltox_0.12.6-1.focal_amd64.deb; \
+  fi
 
 # Upgrade gevent (regularly check if this is still necessary)
 RUN pip3 install gevent==21.1.2
-
-# Fetch vendor resources.
-RUN ./fetch-vendor-resources.sh
 
 # Copy config files
 COPY config/gunicorn.conf.py /etc/opt/gunicorn.conf.py
 
 # Copy utility scripts
-COPY dockerfile_exec.py first_run.sh /usr/local/bin/
+COPY dockerfile_exec.py first_run.sh docker_exec_prod.sh docker_exec_prod_email_notifications.sh docker_exec_write_environment.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker_exec*.sh
 
 # This directory must be present for the AppSource created by our
 # first_run script. The directory only has something in it if
@@ -57,4 +81,4 @@ COPY dockerfile_exec.py first_run.sh /usr/local/bin/
 RUN mkdir -p /mnt/q-files-host
  
 # Set the startup script.
-ENTRYPOINT [ "dockerfile_exec.py" ]
+CMD [ "dockerfile_exec.py" ]
