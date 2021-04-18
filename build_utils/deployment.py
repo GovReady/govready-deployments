@@ -40,7 +40,7 @@ class HelperMixin:
         with subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,  # stderr=subprocess.STDOUT,
                               bufsize=0, env=env) as proc:
             for line in proc.stdout:
-                formatted = line.rstrip().decode()
+                formatted = line.rstrip().decode('utf-8', 'ignore')
                 output += formatted
                 if display_stdout:
                     print(formatted)
