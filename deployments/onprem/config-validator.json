@@ -3,13 +3,13 @@
   {"key": "ADDRESS", "required": true, "description":  "GovReady-Q's public address as would be entered in a web browser. Set with --address HOST:PORT (PORT optional if 443)"},
 
   {"key": "ADMINS", "required": false, "description":  "Administrator accounts. Ex: [{\"username\": \"username\", \"email\":\"first.last@example.com\", \"password\": \"REPLACEME\"}]", "default-message":  "Will auto-create an admin, you need to find it in the logs docker-compose logs"},
-  {"key": "MOUNT_FOLDER", "required": false, "description":  "Mount folder to put artifacts, logs, etc.", "default-message":  "Current directory"},
+  {"key": "MOUNT_FOLDER", "required": false, "description":  "Mount folder to put artifacts, logs, etc.", "default-message":  "Current directory."},
   {"key": "GIT_URL", "required": false, "description":  "GovReady-Q Github Repo", "default-message":  "Defaults to https://github.com/GovReady/govready-q.git"},
-  {"key": "VERSION", "required": false, "description":  "GovReady-Q version/tag", "default-message":  "Defaulting to latest release"},
+  {"key": "VERSION", "required": false, "description":  "GovReady-Q version/tag", "default-message":  "Defaulting to latest release."},
   {"key": "DATABASE_CONNECTION_STRING", "required": false, "description":  "Database connection string: <db_connector>://<username>:<password>@<host>:<port>/<db_name>", "default-message":  "Will create a Postgres server in the docker-compose deployment for you.  It will not have snapshots."},
 
-  {"key": "NGINX_CERT", "required": false, "description":  "Full file path to Nginx cert.pem", "default-message":  "Defaults to self signed"},
-  {"key": "NGINX_KEY", "required": false, "description":  "Full file path to Nginx key.pem", "default-message":  "Defaults to self signed"},
+  {"key": "NGINX_CERT", "required": false, "description":  "Full file path to Nginx cert.pem", "default-message":  "Defaults to self signed."},
+  {"key": "NGINX_KEY", "required": false, "description":  "Full file path to Nginx key.pem", "default-message":  "Defaults to self signed."},
   {"key": "BRANDING", "required": false, "description":  "Full file path to GovReady-Q branding directory", "default-message": "GovReady default branding will be used."},
 
   {"key": "MAILGUN_API_KEY", "required": false, "description":  "Mailgun is used to submit an incoming email from notifications. ", "default-message":  "No default provided."},
