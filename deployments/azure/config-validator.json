@@ -12,7 +12,7 @@
   {"key": "NGINX_KEY", "required": false, "description":  "Full file path to Nginx key.pem", "default-message":  "Defaults to self signed"},
   {"key": "BRANDING", "required": false, "description":  "Full file path to GovReady-Q branding directory", "default-message": "GovReady default branding will be used."},
 
-  {"key": "MAILGUN_API_KEY", "required": false, "description":  "Mailgun is used to submit an incoming email from notifications. ", "default-message":  "No default provided."},
+  {"key": "MAILGUN_API_KEY", "required": false, "description":  "Mailgun is used to submit an incoming email from notifications.", "default-message":  "No default provided."},
   {"key": "EMAIL_HOST", "required": false, "description":  "Host of Email Server.", "default-message":  "No default provided."},
   {"key": "EMAIL_PORT", "required": false, "description":  "Port of Email Server.", "default-message":  "No default provided."},
   {"key": "EMAIL_USER", "required": false, "description":  "User for the Email Server.", "default-message":  "No default provided."},
