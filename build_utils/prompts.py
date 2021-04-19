@@ -1,4 +1,7 @@
 import sys
+import os
+if os.name == 'nt':
+    os.system("color")
 
 
 class Colors:

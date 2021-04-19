@@ -17,7 +17,7 @@ class OnPremiseDeployment(Deployment):
 
     def on_complete(self):
         logs = self.execute(cmd=f"docker-compose logs", display_stdout=False)
-        auto_admin = re.findall('Created administrator account \(username: (admin)\) with password: (.*?)\x1b', logs)
+        auto_admin = re.findall('Created administrator account \(username: (admin)\) with password: ([a-zA-Z0-9#?!@$%^&*-]+)', logs)
         print()
 
         if auto_admin:

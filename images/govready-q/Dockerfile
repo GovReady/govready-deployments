@@ -9,10 +9,10 @@ RUN apt-get update
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Add dos2unix for Windows support of deployments for the CRLF issues
-RUN apt-get install -y dos2unix
+RUN apt-get update && apt-get install -y dos2unix
 
 # Set up the locale.
-RUN apt-get install -y locales && \
+RUN apt-get update && apt-get install -y locales && \
   echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && \
   dpkg-reconfigure locales && \
   update-locale LANG=en_US.UTF-8
@@ -21,12 +21,12 @@ ENV LC_ALL=en_US.UTF-8
 ENV LANGUAGE=en_US:en
 
 # Set up the timezone.
-RUN apt-get install -y --no-install-recommends tzdata && \
+RUN apt-get update && apt-get install -y --no-install-recommends tzdata && \
   ln -fs /usr/share/zoneinfo/UTC /etc/localtime && \
   dpkg-reconfigure tzdata
 
 # Install GovReady-Q prerequisites.
-RUN apt-get -y install \
+RUN apt-get update && apt-get -y install \
   unzip git curl jq \
   python3 python3-pip \
   python3-yaml \
@@ -56,14 +56,14 @@ COPY *${BUILD_FILE_BRANDING} /tmp/
 RUN pip3 install --no-cache-dir -r requirements.txt
 ARG DB_ENGINE
 RUN if [ "$DB_ENGINE" = "mysql" ]; then \
-        apt-get install -y libmysqlclient-dev \
+        apt-get update && apt-get install -y libmysqlclient-dev \
         && pip3 install --no-cache-dir -r requirements_mysql.txt; \
   fi
 
 ARG GR_PDF_GENERATOR
 ARG GR_IMG_GENERATOR
 RUN if [ "$GR_PDF_GENERATOR" = "wkhtmltopdf" ] || [ "$GR_IMG_GENERATOR" = "wkhtmltopdf" ]; then \
-        apt-get -y install wget \
+        apt-get update &&  apt-get -y install wget \
         && wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb \
         && apt install -y ./wkhtmltox_0.12.6-1.focal_amd64.deb; \
   fi
