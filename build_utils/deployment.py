@@ -16,6 +16,11 @@ class HelperMixin:
         signal.signal(signal.SIGINT, self.signal_handler)
         self.kill_captured = False
 
+    def create_secret(self):
+        import secrets
+        alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+        return ''.join(secrets.choice(alphabet) for i in range(50))
+
     def check_if_valid_uri(self, x):
         try:
             result = urlparse(x)
@@ -101,6 +106,26 @@ class HelperMixin:
 
     def on_fail(self):
         raise NotImplementedError()
+
+
+class Initialize(HelperMixin, ABC):
+
+    def __init__(self, validator_json_file):
+        super().__init__()
+        with open(validator_json_file, 'r') as f:
+            self.validation_config_data = json.load(f)
+
+    def run(self, config):
+        raise NotImplementedError()
+
+    def generate(self):
+        skeleton = {}
+        for row in self.validation_config_data:
+            skeleton[row['key']] = ""
+
+        self.run(skeleton)
+        with open("configuration.json", 'w') as f:
+            json.dump(skeleton, f, indent=4, sort_keys=True)
 
 
 class Deployment(HelperMixin, ABC):

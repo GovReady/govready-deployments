@@ -1,8 +1,7 @@
 import argparse
-import json
 import os
 import importlib
-from build_utils.deployment import Deployment, UnDeploy
+from build_utils.deployment import Deployment, UnDeploy, Initialize
 from build_utils.prompts import Prompt
 
 
@@ -14,21 +13,23 @@ def get_deployment_type(deployment_type_list):
 
 def run(options):
     path = f"deployments.{options['type']}.{options['action']}"
+    validator_config = os.path.join(f"{os.path.sep}".join(path.split('.')[:-1]), 'config-validator.json')
+    importlib.import_module(path)
 
     if options['action'] == 'init':
-        validator_config = os.path.join(f"{os.path.sep}".join(path.split('.')[:-1]), 'config-validator.json')
-        skeleton = {}
-        with open(validator_config, 'r') as f:
-            for row in json.load(f):
-                skeleton[row['key']] = ""
-        with open("configuration.json", 'w') as f:
-            json.dump(skeleton, f, indent=4, sort_keys=True)
+        init_classes = Initialize.__subclasses__()
+        if not init_classes:
+            Prompt.error(f"Unable to find class inheriting `Initialize` in {path}", close=True)
+        if not os.path.exists(validator_config):
+            Prompt.error(
+                f"File does not exist: {validator_config}.  Each deployment type must have this file to validate required values for deployment.",
+                close=True)
+        init = init_classes[0](validator_config)
+        init.generate()
         return
 
-    importlib.import_module(path)
     Prompt.warning(f"Attempting to [{options['action']}] using the [{options['type']}] method")
     if options['action'] == 'deploy':
-        validator_config = os.path.join(f"{os.path.sep}".join(path.split('.')[:-1]), 'config-validator.json')
         if not options['config']:
             Prompt.error(f"Deployments require a configuration json that satisfies: [{validator_config}]", close=True)
         deployment_classes = Deployment.__subclasses__()
