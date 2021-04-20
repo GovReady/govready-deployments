@@ -15,5 +15,6 @@ class OnPremiseRemoveDeployment(UnDeploy):
         Prompt.warning(f"If you're not using an external database and would like to wipe your DB, run: {Colors.CYAN}docker volume rm onprem_pg-data")
 
     def run(self):
+        self.check_if_docker_is_started()
         self.execute(cmd="docker-compose down --remove-orphans")
 

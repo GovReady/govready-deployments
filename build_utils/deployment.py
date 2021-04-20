@@ -63,6 +63,13 @@ class HelperMixin:
             self.on_sig_kill()
         sys.exit(0)
 
+    def check_if_docker_is_started(self):
+
+        def offline():
+            Prompt.error("Docker Engine is offline.  Please start before continuing.", close=True)
+
+        self.execute("docker info", {}, display_stdout=False, on_error_fn=offline)
+
     def docker_tmp_file_handler(self, config, docker_tmp_build_files, copy=True):
         for tmp_build in docker_tmp_build_files:
             for key in tmp_build['keys']:
