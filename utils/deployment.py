@@ -42,7 +42,7 @@ class HelperMixin:
         Prompt.notice(f"Executing command: {Colors.WARNING}{cmd}")
         if show_env:
             Prompt.notice(f"Environment Variables: {json.dumps(env_dict, indent=4, sort_keys=True)}")
-        args = dict(stdout=subprocess.PIPE, bufsize=0, env=env)
+        args = dict(stdout=subprocess.PIPE, bufsize=0, env=env, shell=True)
         if not display_stderr:
             args.update(dict(stderr=subprocess.DEVNULL))
         with subprocess.Popen(cmd, **args) as proc:
