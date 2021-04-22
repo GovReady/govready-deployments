@@ -1,7 +1,7 @@
-from build_utils.deployment import UnDeploy
+from utils.deployment import UnDeploy
 
 
-class OnPremiseDistributedRemoveDeployment(UnDeploy):
+class DockerSwarmRemoveDeployment(UnDeploy):
 
     def on_fail(self):
         pass

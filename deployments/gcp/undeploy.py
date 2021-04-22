@@ -1,4 +1,4 @@
-from build_utils.deployment import UnDeploy
+from utils.deployment import UnDeploy
 
 
 class GCPRemoveDeployment(UnDeploy):

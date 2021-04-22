@@ -76,7 +76,7 @@ COPY config/gunicorn.conf.py /etc/opt/gunicorn.conf.py
 
 # Copy utility scripts
 RUN mkdir /tmp/scripts/
-COPY dockerfile_exec.py first_run.sh docker_exec_prod.sh docker_exec_prod_email_notifications.sh docker_exec_write_environment.sh /tmp/scripts/
+COPY first_run.sh docker_exec_prod.sh docker_exec_prod_email_notifications.sh docker_exec_write_environment.sh /tmp/scripts/
 RUN find /tmp/scripts -type f -print0 | xargs -0 dos2unix
 RUN cp /tmp/scripts/* /usr/local/bin/ && rm -rf /tmp/scripts/
 
@@ -87,6 +87,4 @@ RUN chmod +x /usr/local/bin/docker_exec*.sh
 # the container is launched with --mount.
 # --mount type=bind,source="$(pwd)",dst=/mnt/q-files-host
 RUN mkdir -p /mnt/q-files-host
- 
-# Set the startup script.
-CMD [ "dockerfile_exec.py" ]
+

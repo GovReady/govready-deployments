@@ -1,12 +1,13 @@
 from utils.deployment import Initialize
+from utils.prompts import Prompt, Colors
 
 
-class AzureInit(Initialize):
+class DockerComposeInit(Initialize):
     def on_sig_kill(self):
         pass
 
     def on_complete(self):
-        pass
+        Prompt.notice(f"Next step: {Colors.CYAN}python run.py deploy --type docker-compose --config configuration.json")
 
     def on_fail(self):
         pass

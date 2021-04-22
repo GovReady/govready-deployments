@@ -1,8 +1,8 @@
 import argparse
 import os
 import importlib
-from build_utils.deployment import Deployment, UnDeploy, Initialize
-from build_utils.prompts import Prompt
+from utils.deployment import Deployment, UnDeploy, Initialize
+from utils.prompts import Prompt, Colors
 
 
 def get_deployment_type(deployment_type_list):
@@ -24,14 +24,14 @@ def run(options):
             Prompt.error(
                 f"File does not exist: {validator_config}.  Each deployment type must have this file to validate required values for deployment.",
                 close=True)
-        init = init_classes[0](validator_config)
+        init = init_classes[0](validator_config, options)
         init.generate()
         return
 
     Prompt.warning(f"Attempting to [{options['action']}] using the [{options['type']}] method")
     if options['action'] == 'deploy':
         if not options['config']:
-            Prompt.error(f"Deployments require a configuration json that satisfies: [{validator_config}]", close=True)
+            Prompt.error(f"Deployments require a configuration json that satisfies: [{validator_config}].  Please run: {Colors.CYAN}python run.py init", close=True)
         deployment_classes = Deployment.__subclasses__()
         if not deployment_classes:
             Prompt.error(f"Unable to find class inheriting `Deployment` in {path}", close=True)
