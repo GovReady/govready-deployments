@@ -1,7 +1,7 @@
-from build_utils.deployment import Initialize
+from utils.deployment import Initialize
 
 
-class OnPremiseInit(Initialize):
+class DockerSwarmInit(Initialize):
     def on_sig_kill(self):
         pass
 

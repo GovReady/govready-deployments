@@ -4,8 +4,7 @@ networks:
     driver: bridge
 
 services:
-  govready-q:
-    container_name: govready_q_service
+  app:
     build:
       context: ../../images/govready-q
       dockerfile: Dockerfile
@@ -19,8 +18,9 @@ services:
     command: /bin/bash -c docker_exec_prod.sh
     environment:
       - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING-}
-      - ADDRESS=${ADDRESS-}
-      - HTTPS=${HTTPS-}
+      - HOST_ADDRESS=${HOST_ADDRESS-}
+      - HOST_PORT_HTTPS=${HOST_PORT_HTTPS-}
+      - APP_DOCKER_PORT=${APP_DOCKER_PORT-}
       - SECRET_KEY=${SECRET_KEY-}
       - DEBUG=${DEBUG-}
       - ADMINS=${ADMINS-[]}
@@ -47,8 +47,7 @@ services:
     networks:
       - q_network
 
-  govready-q-email-notifications:
-    container_name: govready_q_email_notifications_service
+  email-notifications:
     build:
       context: ../../images/govready-q
       dockerfile: Dockerfile
@@ -60,8 +59,8 @@ services:
     command: /bin/bash -c docker_exec_prod_email_notifications.sh
     environment:
       - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING-}
-      - ADDRESS=${ADDRESS-}
-      - HTTPS=${HTTPS-}
+      - HOST_ADDRESS=${HOST_ADDRESS-}
+      - HOST_PORT_HTTPS=${HOST_PORT_HTTPS-}
       - SECRET_KEY=${SECRET_KEY-}
       - DEBUG=${DEBUG-}
       - ADMINS=${ADMINS-[]}
@@ -79,27 +78,23 @@ services:
     volumes:
       - ${MOUNT_FOLDER}/govready-q-email-notifications:/var/log
     depends_on:
-      govready-q:
+      app:
         condition: service_healthy
     networks:
       - q_network
 
   nginx:
-    container_name: nginx_service
     build:
       context: ../../images/nginx
       args:
-        - HOST=${GOVREADY_Q_HOST-test.example.com}
-        - NGINX_CERT=${NGINX_CERT}
-        - NGINX_KEY=${NGINX_KEY}
+        - HOST_ADDRESS=${HOST_ADDRESS-}
+        - NGINX_CERT=${BUILD_FILE_NGINX_CERT}
+        - NGINX_KEY=${BUILD_FILE_NGINX_KEY}
+        - APP_DOCKER_PORT=${APP_DOCKER_PORT-}
     ports:
-      - "80:80"
-      - "${GOVREADY_Q_PORT-443}:443"
+      - "${HOST_PORT_HTTPS-443}:443"
     depends_on:
-      govready-q:
+      app:
         condition: service_healthy
     networks:
       - q_network
-
-volumes:
-   pg-data:

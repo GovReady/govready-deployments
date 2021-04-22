@@ -1,4 +1,4 @@
-from build_utils.deployment import Initialize
+from utils.deployment import Initialize
 
 
 class AWSInit(Initialize):

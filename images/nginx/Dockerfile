@@ -1,11 +1,14 @@
 FROM nginx:alpine
 
-ARG HOST
+ARG HOST_ADDRESS
+ARG APP_DOCKER_PORT
 
 COPY nginx.conf /etc/nginx/nginx.conf
 RUN \
-   sed -i -e "s|test.example.com|$HOST|" /etc/nginx/nginx.conf \
-&& mkdir -p /etc/pki/tls/certs /etc/pki/tls/private
+   sed -i -e "s|test.example.com|$HOST_ADDRESS|" /etc/nginx/nginx.conf \
+   && sed -i -e "s|app:8000|app:$APP_DOCKER_PORT|" /etc/nginx/nginx.conf \
+   && mkdir -p /etc/pki/tls/certs /etc/pki/tls/private
+
 
 ARG NGINX_CERT
 ARG NGINX_KEY

@@ -1,6 +1,7 @@
 [
-  {"key": "SECRET_KEY", "required": true, "description":  "Django Secret"},
-  {"key": "ADDRESS", "required": true, "description":  "GovReady-Q's public address as would be entered in a web browser. Set with --address HOST:PORT (PORT optional if 443)"},
+  {"key": "SECRET_KEY", "required": true, "description":  "Django Secret Key"},
+  {"key": "HOST_ADDRESS", "required": true, "description":  "GovReady-Q's public address as would be entered in a web browser."},
+  {"key": "HOST_PORT_HTTPS", "required": true, "description":  "GovReady-Q's public address HTTPS port; defaults to 443"},
 
   {"key": "ADMINS", "required": false, "description":  "Administrator accounts. Ex: [{\"username\": \"username\", \"email\":\"first.last@example.com\", \"password\": \"REPLACEME\"}]", "default-message":  "Will auto-create an admin, you need to find it in the logs docker-compose logs"},
   {"key": "MOUNT_FOLDER", "required": false, "description":  "Mount folder to put artifacts, logs, etc.", "default-message":  "Current directory."},

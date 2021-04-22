@@ -1,5 +1,5 @@
 # About
-This is a docker-compose implementation.  It is not distributed in nature and is not meant as a scalable/reliable solution.  It is meant to get the stack up and running for demo or small scale deployments.
+This is a docker-compose single node implementation.  It is not distributed in nature and is not meant as a scalable solution.  It is meant to get the stack up and running for demo or small scale deployments.
 
 
 ## Dependencies
@@ -11,7 +11,8 @@ Make sure you have the following installed:
 ## Configuration File
 | Key                               | Required | Description                                                                                                           | Default message                                                                                      |
 | --------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| ADDRESS                           | ✔       | GovReady-Q's public address as would be entered in a web browser. Set with --address HOST:PORT (PORT optional if 443) | 
+| HOST_ADDRESS                      | ✔       | GovReady-Q's public address as would be entered in a web browser. |
+| HOST_PORT_HTTPS                   | ✔       | GovReady-Q's public address HTTPS port; defaults to 443 | 
 | ADMINS                            | ❌    | Administrator accounts. Ex: `[{"username": "username", "email":"first.last@example.com", "password": "REPLACEME"}]`     | Will auto-create an admin, you need to find it in the logs docker-compose logs                       |
 | BRANDING                          | ❌    | Full file path to GovReady-Q branding directory                                                                       | GovReady default branding will be used.                                                              |
 | DATABASE_CONNECTION_STRING        | ❌    | Database connection string: `<db_connector>://<name>:<password>@<host>:<port>/<db_name>`                                | Will create a Postgres server in the docker-compose deployment for you.  It will not have snapshots. |
@@ -35,8 +36,8 @@ Make sure you have the following installed:
 To build an empty configuration file use `python run.py init` at the root of the project.
 
 ## Local Database
-The local database is persisted in a Docker Volume called `onprem_pg-data`
+The local database is persisted in a Docker Volume called `govready-q_postgres-data`
 
 #### Wipe
 - Remove existing docker build - then:
-- `docker volume rm onprem_pg-data`
+- `docker volume rm govready-q_postgres-data`

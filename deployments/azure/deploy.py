@@ -1,4 +1,4 @@
-from build_utils.deployment import Deployment
+from utils.deployment import Deployment
 
 
 class AzureDeployment(Deployment):

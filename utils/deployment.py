@@ -8,7 +8,7 @@ from contextlib import closing
 from shutil import copyfile, make_archive
 from urllib.parse import urlparse
 
-from build_utils.prompts import Prompt, Colors
+from utils.prompts import Prompt, Colors
 
 
 class HelperMixin:
@@ -28,7 +28,7 @@ class HelperMixin:
         except:
             return False
 
-    def execute(self, cmd, env_dict, display_stdout=True, on_error_fn=None, show_env=False):
+    def execute(self, cmd, env_dict, display_stdout=True, on_error_fn=None, show_env=False, display_stderr=True):
         env = os.environ.copy()
         normalized_dict = {}
         for key, value in env_dict.items():
@@ -42,8 +42,10 @@ class HelperMixin:
         Prompt.notice(f"Executing command: {Colors.WARNING}{cmd}")
         if show_env:
             Prompt.notice(f"Environment Variables: {json.dumps(env_dict, indent=4, sort_keys=True)}")
-        with subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,  # stderr=subprocess.STDOUT,
-                              bufsize=0, env=env) as proc:
+        args = dict(stdout=subprocess.PIPE, bufsize=0, env=env, shell=True)
+        if not display_stderr:
+            args.update(dict(stderr=subprocess.DEVNULL))
+        with subprocess.Popen(cmd, **args) as proc:
             for line in proc.stdout:
                 formatted = line.rstrip().decode('utf-8', 'ignore')
                 output += formatted
@@ -68,7 +70,7 @@ class HelperMixin:
         def offline():
             Prompt.error("Docker Engine is offline.  Please start before continuing.", close=True)
 
-        self.execute("docker info", {}, display_stdout=False, on_error_fn=offline)
+        self.execute("docker info", {}, display_stdout=False, on_error_fn=offline, display_stderr=False)
 
     def docker_tmp_file_handler(self, config, docker_tmp_build_files, copy=True):
         for tmp_build in docker_tmp_build_files:
@@ -117,8 +119,9 @@ class HelperMixin:
 
 class Initialize(HelperMixin, ABC):
 
-    def __init__(self, validator_json_file):
+    def __init__(self, validator_json_file, options):
         super().__init__()
+        self.options = options
         with open(validator_json_file, 'r') as f:
             self.validation_config_data = json.load(f)
 
@@ -133,6 +136,9 @@ class Initialize(HelperMixin, ABC):
         self.run(skeleton)
         with open("configuration.json", 'w') as f:
             json.dump(skeleton, f, indent=4, sort_keys=True)
+        Prompt.warning(f"Configuration created: {Colors.CYAN}configuration.json")
+        Prompt.warning(f"Please set values in the configuration in line with your needs.")
+        Prompt.warning(f"Once fully configured.  Deploy by running: {Colors.CYAN}python run.py deploy --type {self.options['type']} --config configuration.json")
 
 
 class Deployment(HelperMixin, ABC):
@@ -158,11 +164,12 @@ class Deployment(HelperMixin, ABC):
     def docker_build_tmp_files(self, docker_tmp_build_files):
         return super().docker_tmp_file_handler(self.config, docker_tmp_build_files)
 
-    def execute(self, cmd, env_dict=None, display_stdout=True, on_error_fn=None, show_env=False):
+    def execute(self, cmd, env_dict=None, display_stdout=True, on_error_fn=None, show_env=False, display_stderr=True):
         return super().execute(cmd,
                                display_stdout=display_stdout,
                                env_dict=env_dict if env_dict else self.config,
-                               on_error_fn=on_error_fn if on_error_fn else self.on_fail, show_env=show_env)
+                               on_error_fn=on_error_fn if on_error_fn else self.on_fail,
+                               show_env=show_env, display_stderr=display_stderr)
 
     def validate(self):
         with open(self.options['config'], 'r') as f:
@@ -215,8 +222,8 @@ class UnDeploy(HelperMixin, ABC):
     def run(self):
         raise NotImplementedError()
 
-    def execute(self, cmd, env_dict=None, display_stdout=True, on_error_fn=None, show_env=False):
+    def execute(self, cmd, env_dict=None, display_stdout=True, on_error_fn=None, show_env=False, display_stderr=True):
         if env_dict is None:
             env_dict = {}
         return super().execute(cmd, env_dict, display_stdout, on_error_fn=on_error_fn if on_error_fn else self.on_fail,
-                               show_env=show_env)
+                               show_env=show_env, display_stderr=display_stderr)
