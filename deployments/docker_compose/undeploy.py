@@ -16,5 +16,5 @@ class DockerComposeRemoveDeployment(UnDeploy):
 
     def run(self):
         self.check_if_docker_is_started()
-        self.execute(cmd="docker-compose down --remove-orphans")
+        self.execute(cmd="docker-compose down --remove-orphans", env_dict={"COMPOSE_PROJECT_NAME": "govready-q"})
 
