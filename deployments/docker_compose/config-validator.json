@@ -22,5 +22,7 @@
   {"key": "PROXY_AUTHENTICATION_USER_HEADER", "required": false, "description":  "Proxy Authentication User header.", "default-message": "No default provided."},
   {"key": "PROXY_AUTHENTICATION_EMAIL_HEADER", "required": false, "description":  "Proxy Authentication Email header.", "default-message": "No default provided."},
   {"key": "GR_PDF_GENERATOR", "required": false, "description":  "PDF generator binary name.", "default-message": "Default is to disable this feature."},
-  {"key": "GR_IMG_GENERATOR", "required": false, "description":  "IMG generator binary name.", "default-message": "Default is to disable this feature."}
+  {"key": "GR_IMG_GENERATOR", "required": false, "description":  "IMG generator binary name.", "default-message": "Default is to disable this feature."},
+
+  {"key": "REMOVE_STACK_ON_FAIL", "required": false, "description":  "Removes stack on fail of build", "default-message": "Default is True."}
 ]

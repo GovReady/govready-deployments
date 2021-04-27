@@ -11,6 +11,8 @@ class DockerComposeDeployment(Deployment):
     ]
     REQUIRED_PORTS = [5432]
 
+    FAIL_SUFFIX = ""
+
     def on_fail(self):
         self.execute(cmd=f"docker-compose logs")
         self.on_sig_kill()
@@ -30,9 +32,14 @@ class DockerComposeDeployment(Deployment):
         Prompt.warning(f"Access application via Browser: {Colors.CYAN}{url}")
 
     def on_sig_kill(self):
-        self.execute(cmd="docker-compose down --remove-orphans  --rmi all")
+        self.execute(cmd=f"docker-compose down {self.FAIL_SUFFIX}")
 
     def run(self):
+        self.config.setdefault('REMOVE_STACK_ON_FAIL')
+        if self.config['REMOVE_STACK_ON_FAIL']:
+            self.FAIL_SUFFIX = "--remove-orphans --rmi all"
+        del self.config['REMOVE_STACK_ON_FAIL']
+
         self.check_if_docker_is_started()
         self.set_default('COMPOSE_PROJECT_NAME', 'govready-q')  # Prefix for all docker containers
 
@@ -46,7 +53,7 @@ class DockerComposeDeployment(Deployment):
             Prompt.error(f"HOST_ADDRESS cannot be a valid URI.  It must be the domain only.  "
                          f"No protocol or path.  {self.config['HOST_ADDRESS']} is invalid.", close=True)
 
-        self.set_default('HEALTH_CHECK_GOVREADY_Q', f"http://{self.config['HOST_ADDRESS']}:{self.config['APP_DOCKER_PORT']}")
+        self.set_default('HEALTH_CHECK_GOVREADY_Q', f"http://app:{self.config['APP_DOCKER_PORT']}")
         using_internal_db = self.set_default('DATABASE_CONNECTION_STRING',
                                              "postgres://postgres:PASSWORD@postgres:5432/govready_q")
         self.set_default('DB_ENGINE', self.config['DATABASE_CONNECTION_STRING'].split(':')[0])
@@ -54,7 +61,7 @@ class DockerComposeDeployment(Deployment):
         if not using_internal_db:
             docker_compose_file = 'docker-compose.external-db.yaml'
 
-        self.execute(cmd=f"docker-compose -f {docker_compose_file} down --remove-orphans  --rmi all")
+        self.execute(cmd=f"docker-compose -f {docker_compose_file} down {self.FAIL_SUFFIX}")
 
         self.REQUIRED_PORTS += [int(self.config['HOST_PORT_HTTPS']),
                                 int(self.config['APP_DOCKER_PORT'])
