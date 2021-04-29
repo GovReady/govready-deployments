@@ -9,7 +9,8 @@ cat << EOF > local/environment.json
 	"syslog": $(echo ${SYSLOG-} | jq -R .),
 	"govready_admins": ${ADMINS-[]},
 	"static": "static_root",
-	"db": $(echo ${DATABASE_CONNECTION_STRING-} | jq -R .)
+	"db": $(echo ${DATABASE_CONNECTION_STRING-} | jq -R .),
+	"allowed_hosts": ["app", "${HOST_ADDRESS}"]
 }
 EOF
 
