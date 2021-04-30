@@ -10,7 +10,8 @@ cat << EOF > local/environment.json
 	"govready_admins": ${ADMINS-[]},
 	"static": "static_root",
 	"db": $(echo ${DATABASE_CONNECTION_STRING-} | jq -R .),
-	"allowed_hosts": ["app", "${HOST_ADDRESS}"]
+	"allowed_hosts": ["app", "${HOST_ADDRESS}"],
+	"govready-url": "$(echo "https://${HOST_ADDRESS}:${HOST_PORT_HTTPS}" )"
 }
 EOF
 
