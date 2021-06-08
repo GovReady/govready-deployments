@@ -67,5 +67,5 @@ class DockerComposeDeployment(Deployment):
                                 int(self.config['APP_DOCKER_PORT'])
                                 ]
         self.check_ports()
-        self.execute(cmd=f"docker-compose -f {docker_compose_file} build --parallel", show_env=True)
+        self.execute(cmd=f"docker-compose -f {docker_compose_file} build --parallel --no-cache", show_env=True)
         self.execute(cmd=f"docker-compose -f {docker_compose_file} up -d", show_env=True)
