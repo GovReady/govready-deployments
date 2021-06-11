@@ -36,7 +36,8 @@ services:
       - GR_PDF_GENERATOR=${GR_PDF_GENERATOR-}
       - GR_IMG_GENERATOR=${GR_IMG_GENERATOR-}
     volumes:
-      - ${MOUNT_FOLDER}/govready-q:/var/log
+      - ${MOUNT_FOLDER}/govready-q/logs:/var/log
+      - ${MOUNT_FOLDER}/govready-q/data:/data
     ports:
       - "${APP_DOCKER_PORT-8000}:8000"
     depends_on:
@@ -79,7 +80,8 @@ services:
       - GR_PDF_GENERATOR=${GR_PDF_GENERATOR-}
       - GR_IMG_GENERATOR=${GR_IMG_GENERATOR-}
     volumes:
-      - ${MOUNT_FOLDER}/govready-q-email-notifications:/var/log
+      - ${MOUNT_FOLDER}/govready-q-email-notifications/logs:/var/log
+      - ${MOUNT_FOLDER}/govready-q-email-notifications/data:/data
     depends_on:
       app:
         condition: service_healthy
