@@ -11,7 +11,8 @@ cat << EOF > local/environment.json
 	"static": "static_root",
 	"db": $(echo ${DATABASE_CONNECTION_STRING-} | jq -R .),
 	"allowed_hosts": ["app", "${HOST_ADDRESS}"],
-	"govready-url": "$(echo "https://${HOST_ADDRESS}:${HOST_PORT_HTTPS}" )"
+	"govready-url": "$(echo "https://${HOST_ADDRESS}:${HOST_PORT_HTTPS}" )",
+	"okta": ${OKTA-}
 }
 EOF
 

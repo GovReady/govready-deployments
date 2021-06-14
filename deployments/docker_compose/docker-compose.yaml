@@ -35,6 +35,7 @@ services:
       - PROXY_AUTHENTICATION_EMAIL_HEADER=${PROXY_AUTHENTICATION_EMAIL_HEADER-}
       - GR_PDF_GENERATOR=${GR_PDF_GENERATOR-}
       - GR_IMG_GENERATOR=${GR_IMG_GENERATOR-}
+      - OKTA=${OKTA-}
     volumes:
       - ${MOUNT_FOLDER}/govready-q/logs:/var/log
       - ${MOUNT_FOLDER}/govready-q/data:/data
@@ -79,6 +80,7 @@ services:
       - PROXY_AUTHENTICATION_EMAIL_HEADER=${PROXY_AUTHENTICATION_EMAIL_HEADER-}
       - GR_PDF_GENERATOR=${GR_PDF_GENERATOR-}
       - GR_IMG_GENERATOR=${GR_IMG_GENERATOR-}
+      - OKTA=${OKTA-}
     volumes:
       - ${MOUNT_FOLDER}/govready-q-email-notifications/logs:/var/log
       - ${MOUNT_FOLDER}/govready-q-email-notifications/data:/data
