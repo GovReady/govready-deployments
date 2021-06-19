@@ -14,4 +14,4 @@ class DockerComposeInit(Initialize):
 
     def run(self, config):
         config['SECRET_KEY'] = self.create_secret()
-        config['REMOVE_STACK_ON_FAIL'] = True
+        config['PERSIST_STACK'] = False

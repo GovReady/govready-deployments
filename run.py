@@ -69,7 +69,10 @@ if __name__ == '__main__':
     parser.add_argument('--config', help='Config file - used to deploy process', required=False)
     parser.add_argument('--type', help="(Optional) Deployment type; It will prompt you if you don't include.",
                         required=False)
-    args = vars(parser.parse_args())
+
+    args, unknown = parser.parse_known_args()
+    args = vars(args)
+    args['extra'] = unknown
 
     valid_actions = ['deploy', 'undeploy', 'init']
     if args['action'] not in valid_actions:

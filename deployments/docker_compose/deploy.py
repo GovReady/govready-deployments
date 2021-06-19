@@ -30,21 +30,26 @@ class DockerComposeDeployment(Deployment):
         if self.config['HOST_PORT_HTTPS']:
             url += f":{self.config['HOST_PORT_HTTPS']}"
         Prompt.warning(f"Access application via Browser: {Colors.CYAN}{url}")
+        if not self.FAIL_SUFFIX:
+            Prompt.warning(f"WARNING: PERSIST_STACK is enabled.  This may prevent configurations made since "
+                           f"the last creation of the stack.  Persisting a stack will cache the container and won't "
+                           f"rebuild with your new configurations.")
 
     def on_sig_kill(self):
         self.execute(cmd=f"docker-compose down {self.FAIL_SUFFIX}")
 
     def run(self):
-        self.config.setdefault('REMOVE_STACK_ON_FAIL')
-        if self.config['REMOVE_STACK_ON_FAIL']:
+        self.config.setdefault('PERSIST_STACK')
+        if not self.config['PERSIST_STACK']:
             self.FAIL_SUFFIX = "--remove-orphans --rmi all"
-        del self.config['REMOVE_STACK_ON_FAIL']
+        del self.config['PERSIST_STACK']
 
         self.check_if_docker_is_started()
         self.set_default('COMPOSE_PROJECT_NAME', 'govready-q')  # Prefix for all docker containers
 
         self.set_default('GIT_URL', "https://github.com/GovReady/govready-q.git")
         self.set_default('ADMINS', [] if not self.config.get('ADMINS') else self.config.get('ADMINS'))
+        self.set_default('OKTA', {} if not self.config.get('OKTA') else self.config.get('OKTA'))
         self.set_default('MOUNT_FOLDER', os.path.abspath("../../volumes"))
         self.set_default('DEBUG', "false")
         self.set_default('APP_DOCKER_PORT', "18000")
@@ -67,5 +72,4 @@ class DockerComposeDeployment(Deployment):
                                 int(self.config['APP_DOCKER_PORT'])
                                 ]
         self.check_ports()
-        self.execute(cmd=f"docker-compose -f {docker_compose_file} build --parallel --no-cache", show_env=True)
         self.execute(cmd=f"docker-compose -f {docker_compose_file} up -d", show_env=True)

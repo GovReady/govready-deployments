@@ -24,7 +24,7 @@
   {"key": "GR_PDF_GENERATOR", "required": false, "description":  "PDF generator binary name.", "default-message": "Default is to disable this feature."},
   {"key": "GR_IMG_GENERATOR", "required": false, "description":  "IMG generator binary name.", "default-message": "Default is to disable this feature."},
 
-  {"key": "REMOVE_STACK_ON_FAIL", "required": false, "description":  "Removes stack on fail of build", "default-message": "Default is True."},
+  {"key": "PERSIST_STACK", "required": false, "description":  "Persist stack between builds", "default-message": "Default is False."},
 
   {"key": "OKTA", "required": false, "description":  "Okta Configuration for SSO", "default-message": "Feature disabled; using built-in username/password authentication"}
 ]

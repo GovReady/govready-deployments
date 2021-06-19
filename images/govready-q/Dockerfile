@@ -40,7 +40,8 @@ ARG VERSION
 ARG GIT_URL
 # Defaults to latest Release if Tag/Branch not provided
 RUN if [ "$VERSION" = "" ]; then \
-        git -c versionsort.suffix=- ls-remote --tags --sort=v:refname $GIT_URL | tail --lines=1 | cut --delimiter='/' --fields=3 > /tmp/version.txt; \
+        git -c versionsort.suffix=- ls-remote --tags --sort=v:refname $GIT_URL | tail --lines=1 | cut --delimiter='/' \
+         --fields=3 | egrep -o '[v0-9\.]+' > /tmp/version.txt; \
     else \
         echo $VERSION > /tmp/version.txt; \
   fi
