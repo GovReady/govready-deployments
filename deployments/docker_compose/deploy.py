@@ -9,7 +9,7 @@ class DockerComposeDeployment(Deployment):
         {"image": 'nginx', "keys": ['NGINX_CERT', 'NGINX_KEY']},
         {"image": 'govready-q', "keys": ['BRANDING']},
     ]
-    REQUIRED_PORTS = [5432]
+    REQUIRED_PORTS = []
 
     FAIL_SUFFIX = ""
 
@@ -63,7 +63,9 @@ class DockerComposeDeployment(Deployment):
                                              "postgres://postgres:PASSWORD@postgres:5432/govready_q")
         self.set_default('DB_ENGINE', self.config['DATABASE_CONNECTION_STRING'].split(':')[0])
         docker_compose_file = "docker-compose.yaml"
-        if not using_internal_db:
+        if using_internal_db:
+            self.REQUIRED_PORTS.append(5432)
+        else:
             docker_compose_file = 'docker-compose.external-db.yaml'
 
         self.execute(cmd=f"docker-compose -f {docker_compose_file} down {self.FAIL_SUFFIX}")
