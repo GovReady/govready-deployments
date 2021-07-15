@@ -6,3 +6,4 @@ deployment.json
 volumes
 *.pem
 configuration.json
+configuration*.json
