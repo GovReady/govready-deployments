@@ -2,6 +2,9 @@ version: '3'
 networks:
   q_network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: "172.32.0.0/24"
 
 services:
   app:
