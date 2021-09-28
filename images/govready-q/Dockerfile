@@ -45,7 +45,7 @@ RUN if [ "$VERSION" = "" ]; then \
     else \
         echo $VERSION > /tmp/version.txt; \
   fi
-RUN git clone --depth 1 --branch $(cat /tmp/version.txt) ${GIT_URL}
+RUN git clone --depth 1 --branch $(cat /tmp/version.txt) ${GIT_URL} govready-q
 RUN find . -type f -print0 | xargs -0 dos2unix
 
 WORKDIR /opt/govready-q
