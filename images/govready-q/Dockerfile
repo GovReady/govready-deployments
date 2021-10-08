@@ -50,8 +50,6 @@ RUN find . -type f -print0 | xargs -0 dos2unix
 
 WORKDIR /opt/govready-q
 
-ARG BUILD_FILE_BRANDING
-COPY *${BUILD_FILE_BRANDING} /tmp/
 
 # Install Python requirements.
 RUN pip3 install --no-cache-dir -r requirements.txt
@@ -72,6 +70,10 @@ RUN if [ "$GR_PDF_GENERATOR" = "wkhtmltopdf" ] || [ "$GR_IMG_GENERATOR" = "wkhtm
 # Upgrade gevent (regularly check if this is still necessary)
 RUN pip3 install gevent==21.1.2
 
+# Template files
+ARG BUILD_FILE_BRANDING
+COPY *${BUILD_FILE_BRANDING} /tmp/
+
 # Copy config files
 COPY config/gunicorn.conf.py /etc/opt/gunicorn.conf.py
 
@@ -87,5 +89,12 @@ RUN chmod +x /usr/local/bin/docker_exec*.sh
 # first_run script. The directory only has something in it if
 # the container is launched with --mount.
 # --mount type=bind,source="$(pwd)",dst=/mnt/q-files-host
-RUN mkdir -p /mnt/q-files-host
 
+RUN if [ -d "/opt/govready-q/frontend" ]; then \
+    apt-get install -y nodejs npm && \
+    npm install yarn --global && \
+    cd /opt/govready-q/frontend && \
+    yarn && \
+    npm run-script build && \
+    cd -; \
+fi
