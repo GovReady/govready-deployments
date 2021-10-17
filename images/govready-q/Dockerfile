@@ -70,6 +70,14 @@ RUN if [ "$GR_PDF_GENERATOR" = "wkhtmltopdf" ] || [ "$GR_IMG_GENERATOR" = "wkhtm
 # Upgrade gevent (regularly check if this is still necessary)
 RUN pip3 install gevent==21.1.2
 
+# Install NLP tools
+RUN python3 -m spacy download en_core_web_sm
+# Optionally install larger spaCY english model
+# RUN python3 -m spacy download en_core_web_lg
+# Optionally install largest spaCY english vector model
+# RUN python3 -m spacy download en_vectors_web_lg
+
+
 # Template files
 ARG BUILD_FILE_BRANDING
 COPY *${BUILD_FILE_BRANDING} /tmp/
