@@ -1,5 +1,6 @@
 [
   {"key": "SECRET_KEY", "required": true, "description":  "Django Secret Key"},
+  {"key": "ALLOWED_HOSTS", "required": false, "description":  "GovReady-Q's approved list of host names.  If not provided, will default to HOST_ADDRESS."},
   {"key": "HOST_ADDRESS", "required": true, "description":  "GovReady-Q's public address as would be entered in a web browser."},
   {"key": "HOST_PORT_HTTPS", "required": true, "description":  "GovReady-Q's public address HTTPS port; defaults to 443"},
 
