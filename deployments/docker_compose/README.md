@@ -12,6 +12,7 @@ Make sure you have the following installed:
 | Key                               | Required | Description                                                                                                           | Default message                                                                                      |
 | --------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | HOST_ADDRESS                      | ✔       | GovReady-Q's public address as would be entered in a web browser. |
+| ALLOWED_HOSTS                     | ❌       | GovReady-Q's approved list of host names.  If not provided, will default to HOST_ADDRESS. |
 | HOST_PORT_HTTPS                   | ✔       | GovReady-Q's public address HTTPS port; defaults to 443 | 
 | ADMINS                            | ❌    | Administrator accounts. Ex: `[{"username": "username", "email":"first.last@example.com", "password": "REPLACEME"}]`     | Will auto-create an admin, you need to find it in the logs docker-compose logs                       |
 | BRANDING                          | ❌    | Full file path to GovReady-Q branding directory                                                                       | GovReady default branding will be used.                                                              |

@@ -21,6 +21,7 @@ services:
     command: /bin/bash -c docker_exec_prod.sh
     environment:
       - DATABASE_CONNECTION_STRING=${DATABASE_CONNECTION_STRING-}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS-}
       - HOST_ADDRESS=${HOST_ADDRESS-}
       - HOST_PORT_HTTPS=${HOST_PORT_HTTPS-}
       - APP_DOCKER_PORT=${APP_DOCKER_PORT-}
