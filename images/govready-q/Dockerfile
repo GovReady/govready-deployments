@@ -71,6 +71,7 @@ RUN if [ "$GR_PDF_GENERATOR" = "wkhtmltopdf" ] || [ "$GR_IMG_GENERATOR" = "wkhtm
 RUN pip3 install gevent==21.1.2
 
 # Install NLP tools
+RUN pip3 install -U spacy
 RUN python3 -m spacy download en_core_web_sm
 # Optionally install larger spaCY english model
 # RUN python3 -m spacy download en_core_web_lg
