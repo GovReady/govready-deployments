@@ -7,3 +7,6 @@ volumes
 *.pem
 configuration.json
 configuration*.json
+
+*_branding
+venv
