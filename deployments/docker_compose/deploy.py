@@ -51,7 +51,7 @@ class DockerComposeDeployment(Deployment):
         self.set_default('ADMINS', [] if not self.config.get('ADMINS') else self.config.get('ADMINS'))
         self.set_default('OKTA', {} if not self.config.get('OKTA') else self.config.get('OKTA'))
         self.set_default('MOUNT_FOLDER', os.path.abspath("../../volumes"))
-        self.config['ALLOWED_HOSTS'] =  ['app', self.config['HOST_ADDRESS']] + self.config.get('ALLOWED_HOSTS', [])
+        self.config['ALLOWED_HOSTS'] = ['app', self.config['HOST_ADDRESS']] + getattr(self.config, 'ALLOWED_HOSTS', [])
         self.set_default('DEBUG', "false")
         self.set_default('APP_DOCKER_PORT', "18000")
 

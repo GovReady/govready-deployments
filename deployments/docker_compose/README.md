@@ -11,9 +11,9 @@ Make sure you have the following installed:
 ## Configuration File
 | Key                               | Required | Description                                                                                                           | Default message                                                                                      |
 | --------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| HOST_ADDRESS                      | ✔       | GovReady-Q's public address as would be entered in a web browser. |
-| ALLOWED_HOSTS                     | ❌       | GovReady-Q's approved list of host names.  If not provided, will default to HOST_ADDRESS. |
-| HOST_PORT_HTTPS                   | ✔       | GovReady-Q's public address HTTPS port; defaults to 443 | 
+| HOST_ADDRESS                      | ✔     | GovReady-Q's public address as would be entered in a web browser. |
+| ALLOWED_HOSTS                     | ❌    | GovReady-Q's approved list of host names provided as an array. If not provided, will default to HOST_ADDRESS. |
+| HOST_PORT_HTTPS                   | ✔     | GovReady-Q's public address HTTPS port; defaults to 443 |
 | ADMINS                            | ❌    | Administrator accounts. Ex: `[{"username": "username", "email":"first.last@example.com", "password": "REPLACEME"}]`     | Will auto-create an admin, you need to find it in the logs docker-compose logs                       |
 | BRANDING                          | ❌    | Full file path to GovReady-Q branding directory                                                                       | GovReady default branding will be used.                                                              |
 | DATABASE_CONNECTION_STRING        | ❌    | Database connection string: `<db_connector>://<name>:<password>@<host>:<port>/<db_name>`                                | Will create a Postgres server in the docker-compose deployment for you.  It will not have snapshots. |
@@ -32,7 +32,7 @@ Make sure you have the following installed:
 | PERSIST_STACK                     | ❌    | Persist stack between runs.                                                                                           | Default is False |
 | PROXY_AUTHENTICATION_USER_HEADER  | ❌    | Proxy Authentication User header.                                                                                     | No default provided.                                                                                 |
 | PROXY_AUTHENTICATION_EMAIL_HEADER | ❌    | Proxy Authentication Email header.                                                                                    | No default provided.                                                                                 |
-| SECRET_KEY                        | ✔       | Django Secret                                                                                                      |                                                                                   |
+| SECRET_KEY                        | ✔     | Django Secret                                                                                                         |                                                                                   |
 | VERSION                           | ❌    | GovReady-Q version/tag                                                                                                | Defaulting to latest release                                                                         |
 
 To build an empty configuration file use `python run.py init` at the root of the project.
