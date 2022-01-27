@@ -27,5 +27,6 @@
 
   {"key": "PERSIST_STACK", "required": false, "description":  "Persist stack between builds", "default-message": "Default is False."},
 
-  {"key": "OKTA", "required": false, "description":  "Okta Configuration for SSO", "default-message": "Feature disabled; using built-in username/password authentication"}
+  {"key": "OKTA", "required": false, "description":  "Okta Configuration for SSO", "default-message": "Feature disabled; using built-in username/password authentication"},
+  {"key": "OIDC", "required": false, "description":  "OIDC Configuration for SSO", "default-message": "Feature disabled; using built-in username/password authentication"}
 ]
