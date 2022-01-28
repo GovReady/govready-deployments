@@ -13,6 +13,7 @@ cat << EOF > local/environment.json
 	"db": $(echo ${DATABASE_CONNECTION_STRING-} | jq -R .),
 	"allowed_hosts": ${ALLOWED_HOSTS-[]},
 	"govready-url": "$(echo "https://${HOST_ADDRESS}:${HOST_PORT_HTTPS}" )",
+	"oidc": ${OIDC-\{\}},
 	"okta": ${OKTA-\{\}}
 }
 EOF

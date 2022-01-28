@@ -50,6 +50,7 @@ class DockerComposeDeployment(Deployment):
         self.set_default('GIT_URL', "https://github.com/GovReady/govready-q.git")
         self.set_default('ADMINS', [] if not self.config.get('ADMINS') else self.config.get('ADMINS'))
         self.set_default('OKTA', {} if not self.config.get('OKTA') else self.config.get('OKTA'))
+        self.set_default('OIDC', {} if not self.config.get('OIDC') else self.config.get('OIDC'))
         self.set_default('MOUNT_FOLDER', os.path.abspath("../../volumes"))
         self.config['ALLOWED_HOSTS'] = ['app', self.config['HOST_ADDRESS']] + getattr(self.config, 'ALLOWED_HOSTS', [])
         self.set_default('DEBUG', "false")

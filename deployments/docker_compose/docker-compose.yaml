@@ -40,6 +40,7 @@ services:
       - GR_PDF_GENERATOR=${GR_PDF_GENERATOR-}
       - GR_IMG_GENERATOR=${GR_IMG_GENERATOR-}
       - OKTA=${OKTA-}
+      - OIDC=${OIDC-}
     volumes:
       - ${MOUNT_FOLDER}/govready-q/logs:/var/log
       - ${MOUNT_FOLDER}/govready-q/data:/data
