@@ -9,7 +9,7 @@ RUN apt-get update
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Add dos2unix for Windows support of deployments for the CRLF issues
-RUN apt-get update && apt-get install -y dos2unix
+RUN apt-get update && apt-get install -y dos2unix netcat
 
 # Set up the locale.
 RUN apt-get update && apt-get install -y locales && \
@@ -85,6 +85,7 @@ COPY *${BUILD_FILE_BRANDING} /tmp/
 
 # Copy config files
 COPY config/gunicorn.conf.py /etc/opt/gunicorn.conf.py
+COPY wait-for-database.py /etc/opt/wait-for-database.py
 
 # Copy utility scripts
 RUN mkdir /tmp/scripts/

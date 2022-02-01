@@ -47,8 +47,7 @@ services:
     ports:
       - "${APP_DOCKER_PORT-8000}:8000"
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     healthcheck:
       test: curl --fail -s $$HEALTH_CHECK_GOVREADY_Q || exit 1
       interval: 10s
@@ -65,11 +64,13 @@ services:
         - NGINX_CERT=${BUILD_FILE_NGINX_CERT}
         - NGINX_KEY=${BUILD_FILE_NGINX_KEY}
         - APP_DOCKER_PORT=${APP_DOCKER_PORT-}
+    command: /bin/sh -c /etc/opt/docker-entrypoint.sh
+    environment:
+      - APP_DOCKER_PORT=${APP_DOCKER_PORT-}
     ports:
       - "${HOST_PORT_HTTPS-443}:443"
     depends_on:
-      app:
-        condition: service_healthy
+      - app
     networks:
       - q_network
 
@@ -78,11 +79,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - type: volume
-        source: postgres-data
-        target: /postgres-data
-        volume:
-          nocopy: false
+      - postgres-data:/postgres-data
     environment:
       POSTGRES_DB: govready_q
       POSTGRES_PASSWORD: PASSWORD

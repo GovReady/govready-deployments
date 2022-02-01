@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 /usr/local/bin/docker_exec_write_environment.sh
+python3 /etc/opt/wait-for-database.py
 
 echo "[ + ] Running checks"
 python3 manage.py check --deploy
