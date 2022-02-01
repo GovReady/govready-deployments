@@ -15,6 +15,7 @@ ARG NGINX_KEY
 
 COPY ${NGINX_CERT}* /etc/pki/tls/certs/
 COPY ${NGINX_KEY}* /etc/pki/tls/private/
+COPY docker-entrypoint.sh /etc/opt/docker-entrypoint.sh
 
 RUN if [ "$NGINX_CERT" = "" ]; then \
     apk add --no-cache --update openssl \
