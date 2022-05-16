@@ -55,6 +55,7 @@ class DockerComposeDeployment(Deployment):
         self.config['ALLOWED_HOSTS'] = ['app', self.config['HOST_ADDRESS']] + getattr(self.config, 'ALLOWED_HOSTS', [])
         self.set_default('DEBUG', "false")
         self.set_default('APP_DOCKER_PORT', "18000")
+        self.set_default('CERTBOT_PORT', "80")
 
         if self.check_if_valid_uri(self.config['HOST_ADDRESS']):
             Prompt.error(f"HOST_ADDRESS cannot be a valid URI.  It must be the domain only.  "
@@ -73,7 +74,8 @@ class DockerComposeDeployment(Deployment):
         self.execute(cmd=f"docker-compose -f {docker_compose_file} down {self.FAIL_SUFFIX}")
 
         self.REQUIRED_PORTS += [int(self.config['HOST_PORT_HTTPS']),
-                                int(self.config['APP_DOCKER_PORT'])
+                                int(self.config['APP_DOCKER_PORT']),
+                                int(self.config['CERTBOT_PORT'])
                                 ]
         self.check_ports()
         self.execute(cmd=f"docker-compose -f {docker_compose_file} up -d", show_env=True)

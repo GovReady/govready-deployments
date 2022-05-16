@@ -25,6 +25,7 @@ services:
       - HOST_ADDRESS=${HOST_ADDRESS-}
       - HOST_PORT_HTTPS=${HOST_PORT_HTTPS-}
       - APP_DOCKER_PORT=${APP_DOCKER_PORT-}
+      - CERTBOT_PORT=80
       - SECRET_KEY=${SECRET_KEY-}
       - DEBUG=${DEBUG-}
       - ADMINS=${ADMINS-[]}
@@ -69,7 +70,7 @@ services:
       - APP_DOCKER_PORT=${APP_DOCKER_PORT-}
     ports:
       - "${HOST_PORT_HTTPS-443}:443"
-      - "80:80"
+      - "${CERTBOT_PORT-80}:80"
     depends_on:
       - app
     networks:
