@@ -69,6 +69,7 @@ services:
       - APP_DOCKER_PORT=${APP_DOCKER_PORT-}
     ports:
       - "${HOST_PORT_HTTPS-443}:443"
+      - "${HOST_PORT_HTTPS-80}:80"
     depends_on:
       - app
     networks:
