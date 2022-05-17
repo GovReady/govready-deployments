@@ -74,8 +74,8 @@ class DockerComposeDeployment(Deployment):
         self.execute(cmd=f"docker-compose -f {docker_compose_file} down {self.FAIL_SUFFIX}")
 
         self.REQUIRED_PORTS += [int(self.config['HOST_PORT_HTTPS']),
-                                int(self.config['APP_DOCKER_PORT']),
-                                int(self.config['CERTBOT_PORT'])
+                                int(self.config['HOST_PORT_HTTP']),
+                                int(self.config['APP_DOCKER_PORT'])
                                 ]
         self.check_ports()
         self.execute(cmd=f"docker-compose -f {docker_compose_file} up -d", show_env=True)
