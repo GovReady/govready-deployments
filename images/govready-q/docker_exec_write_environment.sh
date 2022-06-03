@@ -6,6 +6,7 @@ cat << EOF > local/environment.json
 {
 	"debug": ${DEBUG-false},
 	"host": "$(echo "${HOST_ADDRESS}:${HOST_PORT_HTTPS}" )",
+	"host_http": "$(echo "${HOST_ADDRESS}:${HOST_PORT_HTTP}" )",
 	"secret-key": $(echo ${SECRET_KEY-} | jq -R .),
 	"syslog": $(echo ${SYSLOG-} | jq -R .),
 	"govready_admins": ${ADMINS-[]},

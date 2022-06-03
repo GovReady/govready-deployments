@@ -3,6 +3,7 @@
   {"key": "ALLOWED_HOSTS", "required": false, "description":  "GovReady-Q's approved list of host names.  If not provided, will default to HOST_ADDRESS."},
   {"key": "HOST_ADDRESS", "required": true, "description":  "GovReady-Q's public address as would be entered in a web browser."},
   {"key": "HOST_PORT_HTTPS", "required": true, "description":  "GovReady-Q's public address HTTPS port; defaults to 443"},
+  {"key": "HOST_PORT_HTTP", "required": false, "description":  "GovReady-Q's public address HTTP port; defaults to 80"},
 
   {"key": "ADMINS", "required": false, "description":  "Administrator accounts. Ex: [{\"username\": \"username\", \"email\":\"first.last@example.com\", \"password\": \"REPLACEME\"}]", "default-message":  "Will auto-create an admin, you need to find it in the logs docker-compose logs"},
   {"key": "MOUNT_FOLDER", "required": false, "description":  "Mount folder to put artifacts, logs, etc.", "default-message":  "Current directory."},

@@ -24,6 +24,7 @@ services:
       - ALLOWED_HOSTS=${ALLOWED_HOSTS-}
       - HOST_ADDRESS=${HOST_ADDRESS-}
       - HOST_PORT_HTTPS=${HOST_PORT_HTTPS-}
+      - HOST_PORT_HTTP=${HOST_PORT_HTTP-}
       - APP_DOCKER_PORT=${APP_DOCKER_PORT-}
       - SECRET_KEY=${SECRET_KEY-}
       - DEBUG=${DEBUG-}
@@ -69,6 +70,7 @@ services:
       - APP_DOCKER_PORT=${APP_DOCKER_PORT-}
     ports:
       - "${HOST_PORT_HTTPS-443}:443"
+      - "${HOST_PORT_HTTP-80}:80"
     depends_on:
       - app
     networks:
