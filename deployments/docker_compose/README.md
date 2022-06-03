@@ -14,7 +14,7 @@ Make sure you have the following installed:
 | HOST_ADDRESS                      | ✔     | GovReady-Q's public address as would be entered in a web browser. |
 | ALLOWED_HOSTS                     | ❌    | GovReady-Q's approved list of host names provided as an array. If not provided, will default to HOST_ADDRESS. |
 | HOST_PORT_HTTPS                   | ✔     | GovReady-Q's public address HTTPS port; defaults to 443 |
-| HOST_PORT_HTTP                    | ❌    | GovReady-Q's public address HTTP port; defaults to 80 |
+| HOST_PORT_HTTP                    | ❌    | GovReady-Q's public address HTTP port; defaults to 80   |
 | ADMINS                            | ✔    | Administrator accounts. Ex: `[{"username": "username", "email":"first.last@example.com", "password": "REPLACEME"}]`     | Will auto-create an admin, you need to find it in the logs docker-compose logs                       |
 | BRANDING                          | ❌    | Full file path to GovReady-Q branding directory                                                                       | GovReady default branding will be used.                                                              |
 | DATABASE_CONNECTION_STRING        | ❌    | Database connection string: `<db_connector>://<name>:<password>@<host>:<port>/<db_name>`                                | Will create a Postgres server in the docker-compose deployment for you.  It will not have snapshots. |
@@ -50,13 +50,15 @@ The Docker container running the default PostgreSQL is Alpine Linux. The Postgre
 - Remove existing docker build - then:
 - `docker volume rm govready-q_postgres-data`
 
-## Local Host Database
+## Running Database on Host or Seperate Server
 
-It is also possible to connect Docker-ized GovReady-Q instance to a PostgreSQL database instance running on HOST machine (i.e., not in Docker) following the below instructions.
+You can also connect a Docker-ized GovReady-Q instance to a persistent Postgres database running on:
 
-This configuration provides a persistent Postgres database on the Host machine that is used by a GovReady deployment running withing docker containers on the host machine.
+1. the Host machine that is used by a GovReady deployment running the docker containers (e.g., Postgres not in a container)
+2. a second server
+3. a managed Postgres service run by you Cloud Service Provider
 
-(Instructions for Ubuntu 18.04. Adjust appropriately for your OS.)
+The following instructions are for option #1 on Ubuntu 18.04, which keeps everything on one server while reducing the chance of accidentally wiping a containerized Postgres database. (Adjust appropriately for your OS.)
 
 For additional information see https://www.postgresql.org/docs/current/static/auth-pg-hba-conf.html.
 
@@ -64,13 +66,13 @@ For additional information see https://www.postgresql.org/docs/current/static/au
 
 Modify the Host's Postgres configuration file `/etc/postgresql/10/main/postgresql.conf` to instruct Postgres to listen on the Host machine's IP address, Host name, etc.:
 
-```
+```bash
 listen_addresses = 'localhost, ip_address, domain_name'
 ```
 
 Example:
 
-```
+```bash
 listen_addresses = 'localhost, 10.1.0.10'
 ```
 
@@ -78,11 +80,13 @@ listen_addresses = 'localhost, 10.1.0.10'
 
 Modify Host's Postgres configuration file `/etc/postgres/10/main/pg_hba.conf` to permit connection from the GovReady-Q instance running in the docker container by allowing a connection from the IP address the Host perceives for the docker container.
 
-GovReady-Q's docker compose network is configured with the IP address `172.32.0.0/24`. (If you deployed GovReady using Docker-Compose, the IP address will be that of the Docker-Compose network bridge. If you deployed GovReady using a single container, the IP address will be that of the container's IP address.)
+GovReady-Q's docker compose network is configured with the IP address `172.32.0.0/24`.
+
+NOTES: If you deployed GovReady using Docker-Compose, the IP address will be that of the Docker-Compose network bridge. If you deployed GovReady using a single container, the IP address will be that of the container's IP address. If you are connecting to a database on a remote server, the IP address of the GovReady-Q instance is the Host machine's IP address.
 
 Configure `pg_hba.conf` to permit connections from the perceived IP address of docker network (or container):
 
-```
+```bash
 host all all 172.32.0.0/24 password
 local all postgres peer
 ...
@@ -127,18 +131,94 @@ This configuration provides a persistent Postgres database on the Host machine t
 
 When a `Server Error (500)` appears the will almost always be written to the log file in the `govready-q_app_1` container and can be accessed from the following `tail` command on the HOST machine:
 
-```
+```bash
 tail <path_to>/govready-deployments/volumes/govready-q/logs/gunicorn.error.log
 ```
 
 This file can also be reached from the GovReady-Q container (govready-q_app_1):
 
+```bash
+docker exec -it govready-q_app_1 tail /var/log/gunicorn.error.log
 ```
-sudo docker exec -it govready-q_app_1 tail /var/log/gunicorn.error.log
-```
+
+NOTE: You may need to prefix your docker commands with `sudo` depending on the relative ownership of Docker and ownership and install directory of `govready-deployments` on your Host.
 
 The STDOUT of the GovReady-Q as it runs can be viewed by attaching in a terminal to the GovReady-Q container via the command (for example):
 
+```bash
+docker attach govready-q_app_1
 ```
-sudo docker attach govready-q_app_1
+
+## Setting up SSL via Let's Encrypt certbot
+
+The following instructions describe the general process of using Let's Encrypt certbot to configure an SSL certificate for your instance on Ubuntu 18.04. (Adjust appropriately for your OS.)
+
+GovReady-Q's NGINX is preconfigred to allow port 80 access to the path where certbot adds a file for validating the domain.
+
+You may find it useful to read one of the many posts online regarding certbot for additional hints.
+
+### Step 1 - Connect to NGINX instance.
+
+First, connect to NINGX running in the Docker container.
+
+```bash
+docker exec -it govready-q_nginx_1 /bin/sh
 ```
+
+NOTE: The NGINX container uses the Alpine OS.
+
+### Step 2 - Install certbot
+
+Install certbot and it’s NINGX plugin with apt:
+
+```bash
+apk add certbot certbot-nginx
+```
+
+NOTE: The NINGX configure file is `/etc/nginx/nginx.conf `. Also, `sudo` is not installed in the Alpine NGINX container. You are root when you exec'ed into the container.
+
+### Step 3 - Run certbot to Obtain an SSL Certificate
+
+Now run certbot by typing the following:
+
+```bash
+certbot --nginx -d example.com
+```
+
+This runs certbot with the --nginx plugin, using -d to specify the domain names for the certificate. Be sure to use the same domain as specified GovReady's configuration file (e.g., "HOST_ADDRESS": "example.com").
+
+You will be prompted to enter an email address, agree to the terms of service and other information. certbot will communicate with the Let’s Encrypt server, then run a challenge to verify that you control the domain. GovReady-Q's NGINX is preconfigred to allow port 80 access to the path where certbot adds a file for validating the domain. certbot's NGINX plugin will reconfiguring NGINX and reload the config whenever necessary. 
+
+Complete any additional certbot prompts to configure your HTTPS settings.
+
+NOTE: Firewall configurations that block access over port 80 and 443 are a common source of certbot failures. Make sure your Host firewall (and any other firewalls) are properly configured to allow port 80 and port 443 access for inbound remote requests.
+
+### Step 4 - Access your Server
+
+You should now be able to access your server via HTTPS and see a valid certificate.
+
+### Step 5 - Exit the Container
+
+You're done. Type the following to exit the NGINX container:
+
+```bash
+exit
+```
+
+### Step 6 - Routinely Renew the Certificate
+
+Re-run certbot every ninety days to renew the certificate by typing the following:
+
+```bash
+docker exec -it govready-q_nginx_1 /bin/sh
+certbot --nginx -d example.com
+```
+
+Alternatively, allow certbot to automatically renew by typing the following:
+
+```bash
+systemctl status certbot.timer
+```
+
+
+
