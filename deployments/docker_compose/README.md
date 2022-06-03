@@ -47,8 +47,12 @@ The local database running in Docker container is persisted between deploys in a
 The Docker container running the default PostgreSQL is Alpine Linux. The PostgreSQL configuration files located in the `/postgres-data` directory (e.g., `/postgres-data/postgresql.conf`).
 
 #### Wipe Local Docker Database Volume
-- Remove existing docker build - then:
-- `docker volume rm govready-q_postgres-data`
+
+Remove existing docker build - then:
+
+```bash
+docker volume rm govready-q_postgres-data`
+```
 
 ## Running Database on Host or Seperate Server
 
