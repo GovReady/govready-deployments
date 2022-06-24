@@ -14,6 +14,13 @@ python3 manage.py migrate
 python3 manage.py load_modules
 python3 manage.py first_run --non-interactive
 
+# Aspen upgrades if installing aspen version
+FILE=siteapp/management/commands/upgrade_aspen.py
+if test -f "$FILE"; then
+    echo "[ + ] Applying Aspen configuration upgrades"
+    python3 manage.py upgrade_aspen --non-interactive
+fi
+
 # Start server
 echo "[ + ] Starting server"
 gunicorn --config /etc/opt/gunicorn.conf.py siteapp.wsgi
