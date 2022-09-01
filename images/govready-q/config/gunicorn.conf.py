@@ -7,6 +7,7 @@ bind = f'0.0.0.0:{os.environ["APP_DOCKER_PORT"]}'
 workers = 1
 worker_class = 'gevent'
 keepalive = 10
+timeout = 600
 
 # Access log - records incoming HTTP requests
 accesslog = "/var/log/gunicorn.access.log"
