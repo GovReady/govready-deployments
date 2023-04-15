@@ -52,6 +52,8 @@ WORKDIR /opt/govready-q
 
 
 # Install Python requirements.
+RUN pip3 install --upgrade pip
+RUN pip install --ignore-installed PyYAML
 RUN pip3 install --no-cache-dir -r requirements.txt
 ARG DB_ENGINE
 RUN if [ "$DB_ENGINE" = "mysql" ]; then \
@@ -68,7 +70,7 @@ RUN if [ "$GR_PDF_GENERATOR" = "wkhtmltopdf" ] || [ "$GR_IMG_GENERATOR" = "wkhtm
   fi
 
 # Upgrade gevent (regularly check if this is still necessary)
-RUN pip3 install gevent==21.1.2
+RUN pip3 install gevent==22.10.2
 
 # Install NLP tools
 RUN pip3 install -U spacy
