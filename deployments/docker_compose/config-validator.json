@@ -6,6 +6,7 @@
   {"key": "HOST_PORT_HTTP", "required": false, "description":  "GovReady-Q's public address HTTP port; defaults to 80"},
 
   {"key": "ADMINS", "required": false, "description":  "Administrator accounts. Ex: [{\"username\": \"username\", \"email\":\"first.last@example.com\", \"password\": \"REPLACEME\"}]", "default-message":  "Will auto-create an admin, you need to find it in the logs docker-compose logs"},
+  {"key": "GOVREADY_USERS", "required": false, "description":  "User accounts. Ex: [{\"username\": \"username\", \"email\":\"first.last@example.com\", \"password\": \"REPLACEME\"}]", "default-message":  "Will auto-create an user, you need to find it in the logs docker-compose logs"},
   {"key": "MOUNT_FOLDER", "required": false, "description":  "Mount folder to put artifacts, logs, etc.", "default-message":  "Current directory."},
   {"key": "GIT_URL", "required": false, "description":  "GovReady-Q Github Repo", "default-message":  "Defaults to https://github.com/GovReady/govready-q.git"},
   {"key": "VERSION", "required": false, "description":  "GovReady-Q version/tag", "default-message":  "Defaulting to latest release."},
