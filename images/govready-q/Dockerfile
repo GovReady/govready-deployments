@@ -122,6 +122,7 @@ RUN if [ -d "/opt/govready-q/frontend" ]; then \
     npm install yarn --global && \
     cd /opt/govready-q/frontend && \
     yarn && \
+    npm install @mui/material && \
     npm run-script build && \
     cd -; \
 fi
