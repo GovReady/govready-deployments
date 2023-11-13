@@ -1,5 +1,5 @@
-# Ubuntu 20.04 focal-20210119
-FROM ubuntu:focal-20210119
+# Ubuntu 22.04 jammy-20231004
+FROM ubuntu:jammy-20231004
 
 # Expose the port that `manage.py runserver` uses by default.
 EXPOSE 8000
@@ -26,12 +26,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends tzdata && \
   dpkg-reconfigure tzdata
 
 # Install GovReady-Q prerequisites.
-RUN apt-get update && apt-get -y install \
+RUN apt-get -y install \
   unzip git curl jq \
   python3 python3-pip \
   python3-yaml \
   graphviz pandoc \
-  gunicorn
+  gunicorn libmagic-dev
+
+# Set up tools
+RUN apt install -y build-essential
+RUN python3 -m pip install --upgrade setuptools
 
 # Install GovReady application.
 WORKDIR /opt
