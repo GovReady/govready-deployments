@@ -115,14 +115,13 @@ RUN chmod +x /usr/local/bin/docker_exec*.sh
 #    cd -; \
 #fi
 
-RUN if [ -d "/opt/govready-q/frontend" ]; then \
-    curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
-    apt-get update && \
-    apt-get install nodejs && \
-    npm install yarn --global && \
-    cd /opt/govready-q/frontend && \
-    yarn && \
-    npm install @mui/material && \
-    npm run-script build && \
-    cd -; \
-fi
+#RUN if [ -d "/opt/govready-q/frontend" ]; then \
+#    curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+#    apt-get update && \
+#    apt-get install nodejs && \
+#    npm install yarn --global && \
+#    cd /opt/govready-q/frontend && \
+#    yarn && \
+#    npm run-script build && \
+#    cd -; \
+#fi
